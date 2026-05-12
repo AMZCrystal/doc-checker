@@ -362,7 +362,9 @@
           reqBox.style.display = 'block';
           let imgHtml = '';
           if (imgs.length > 0) {
-            imgHtml = '<div style="margin-top:12px;"><strong style="font-size:13px;">📷 文件圖例：</strong><p style="font-size:11px; color:#d13212; margin:4px 0;">⚠️ 以下截圖僅供參考需求資訊，上傳資料請使用掃描完整文檔，勿用照片截圖。</p><div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:8px;">' +
+            const imgTitle = currentLang === 'en' ? '📷 Document Examples:' : '📷 文件圖例：';
+            const imgDisclaimer = currentLang === 'en' ? '⚠️ Images below are for reference only. Please upload color-scanned complete documents, not photo screenshots.' : '⚠️ 以下截圖僅供參考需求資訊，上傳資料請使用掃描完整文檔，勿用照片截圖。';
+            imgHtml = '<div style="margin-top:12px;"><strong style="font-size:13px;">' + imgTitle + '</strong><p style="font-size:11px; color:#d13212; margin:4px 0;">' + imgDisclaimer + '</p><div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:8px;">' +
               imgs.map(src => `<img src="${src}" style="max-width:280px; border:1px solid #ddd; border-radius:4px; cursor:pointer;" onclick="window.open('${src}','_blank')" title="點擊放大">`).join('') +
               '</div></div>';
           }
