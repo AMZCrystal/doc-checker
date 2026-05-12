@@ -105,24 +105,6 @@
       </div>
 
       <!-- Remove old req-display -->
-      
-      <!-- Upload area (appears after selecting doc type) -->
-      <div id="upload-section" style="display:none; margin-top:16px;">
-        <div style="font-size:14px; font-weight:700; color:#232f3e; margin-bottom:8px;">📤 上傳文件</div>
-        <div class="upload-area" id="upload-area">
-          <div class="icon">📄</div>
-          <p>點擊或拖拉文件至此處上傳</p>
-          <p style="font-size:11px; color:#999;">支援 JPG, PNG, PDF（單檔最大 10MB）| 須為彩色掃描</p>
-        </div>
-        <input type="file" class="file-input" id="file-input" accept=".jpg,.jpeg,.png,.pdf" multiple>
-        <div id="file-list"></div>
-      </div>
-
-      <!-- Check button (appears after upload) -->
-      <div id="check-section" style="display:none; margin-top:16px;">
-        <button class="check-btn" id="check-btn" disabled>開始檢查文件</button>
-        <div class="results-container" id="results"></div>
-      </div>
     </div>
 
     <!-- Preparation Tips -->
@@ -352,6 +334,7 @@
         document.querySelectorAll('.doc-option').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         selectedType = btn.dataset.type;
+        uploadedFiles = [];  // Reset files when switching type
 
         const req = docRequirements[selectedType];
         const imgs = docImages[selectedType] || [];
@@ -368,24 +351,38 @@
               imgs.map(src => `<img src="${src}" style="max-width:280px; border:1px solid #ddd; border-radius:4px; cursor:pointer;" onclick="window.open('${src}','_blank')" title="點擊放大">`).join('') +
               '</div></div>';
           }
-          reqBox.innerHTML = `<h4>📌 ${req.name} — 文件要求</h4><ul>${req.rules.map(r => '<li>' + r + '</li>').join('')}</ul>${imgHtml}`;
+          reqBox.innerHTML = `<h4>📌 ${req.name} — 文件要求</h4><ul>${req.rules.map(r => '<li>' + r + '</li>').join('')}</ul>${imgHtml}
+            <div style="margin-top:16px;">
+              <div style="font-size:14px; font-weight:700; color:#232f3e; margin-bottom:8px;">📤 上傳文件</div>
+              <div class="upload-area" id="upload-area">
+                <div class="icon">📄</div>
+                <p>點擊或拖拉文件至此處上傳</p>
+                <p style="font-size:11px; color:#999;">支援 JPG, PNG, PDF（單檔最大 10MB）| 須為彩色掃描</p>
+              </div>
+              <input type="file" class="file-input" id="file-input" accept=".jpg,.jpeg,.png,.pdf" multiple>
+              <div id="file-list"></div>
+            </div>
+            <div style="margin-top:16px;">
+              <button class="check-btn" id="check-btn" disabled>開始檢查文件</button>
+              <div class="results-container" id="results"></div>
+            </div>`;
+          
+          // Re-bind upload events
+          const uploadArea = document.getElementById('upload-area');
+          const fileInput = document.getElementById('file-input');
+          uploadArea.addEventListener('click', () => fileInput.click());
+          uploadArea.addEventListener('dragover', (e) => { e.preventDefault(); uploadArea.classList.add('dragover'); });
+          uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
+          uploadArea.addEventListener('drop', (e) => { e.preventDefault(); uploadArea.classList.remove('dragover'); handleFiles(e.dataTransfer.files); });
+          fileInput.addEventListener('change', (e) => handleFiles(e.target.files));
+          document.getElementById('check-btn').addEventListener('click', performCheck);
         }
 
-        document.getElementById('upload-section').style.display = 'block';
-        document.getElementById('check-section').style.display = 'block';
         updateCheckBtn();
       });
     });
 
-    // Upload
-    const uploadArea = document.getElementById('upload-area');
-    const fileInput = document.getElementById('file-input');
-    uploadArea.addEventListener('click', () => fileInput.click());
-    uploadArea.addEventListener('dragover', (e) => { e.preventDefault(); uploadArea.classList.add('dragover'); });
-    uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
-    uploadArea.addEventListener('drop', (e) => { e.preventDefault(); uploadArea.classList.remove('dragover'); handleFiles(e.dataTransfer.files); });
-    fileInput.addEventListener('change', (e) => handleFiles(e.target.files));
-
+    // Upload - events are now bound dynamically in doc-option click handler
     function handleFiles(files) {
       for (let file of files) {
         if (uploadedFiles.length >= 5) { alert('最多上傳 5 個檔案'); return; }
@@ -405,7 +402,10 @@
     }
 
     function removeFile(i) { uploadedFiles.splice(i, 1); renderFileList(); updateCheckBtn(); }
-    function updateCheckBtn() { document.getElementById('check-btn').disabled = !(selectedType && uploadedFiles.length > 0); }
+    function updateCheckBtn() { 
+      const btn = document.getElementById('check-btn');
+      if (btn) btn.disabled = !(selectedType && uploadedFiles.length > 0); 
+    }
 
     // Check
     document.getElementById('check-btn').addEventListener('click', performCheck);
