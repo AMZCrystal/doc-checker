@@ -73,6 +73,7 @@
           <button class="doc-option" data-type="national_id">國民身分證</button>
           <button class="doc-option" data-type="passport">護照</button>
         </div>
+        <div class="req-box category-req" data-for="national_id,passport" style="display:none;"></div>
       </div>
 
       <div class="category">
@@ -82,6 +83,7 @@
           <button class="doc-option" data-type="company_change">公司變更登記表</button>
           <button class="doc-option" data-type="business_reg">商業登記核准函 + 商業登記抄本</button>
         </div>
+        <div class="req-box category-req" data-for="company_setup,company_change,business_reg" style="display:none;"></div>
       </div>
 
       <div class="category">
@@ -90,6 +92,7 @@
           <button class="doc-option" data-type="utility_bill">公用事業帳單（水/電/瓦斯/電信）</button>
           <button class="doc-option" data-type="address_bank">銀行對帳單（作為地址證明）</button>
         </div>
+        <div class="req-box category-req" data-for="utility_bill,address_bank" style="display:none;"></div>
       </div>
 
       <div class="category">
@@ -98,13 +101,10 @@
           <button class="doc-option" data-type="bank_statement">銀行對帳單</button>
           <button class="doc-option" data-type="bank_passbook">銀行存摺封面</button>
         </div>
+        <div class="req-box category-req" data-for="bank_statement,bank_passbook" style="display:none;"></div>
       </div>
 
-      <!-- Requirements -->
-      <div id="req-display" class="req-box" style="display:none;">
-        <h4 id="req-title">📌 文件要求</h4>
-        <ul id="req-list"></ul>
-      </div>
+      <!-- Remove old req-display -->
     </div>
 
     <!-- Step 2: Upload -->
@@ -124,6 +124,24 @@
       <h2>步驟三：開始檢查</h2>
       <button class="check-btn" id="check-btn" disabled>開始檢查文件</button>
       <div class="results-container" id="results"></div>
+    </div>
+    <!-- Preparation Tips -->
+    <div class="card">
+      <h2>📝 註冊時可同步準備的資料</h2>
+      <ul style="list-style:none; padding:0; margin:0;">
+        <li style="padding:10px 0; border-bottom:1px solid #f0f0f0; font-size:14px;">
+          💳 <strong>可刷外幣的信用卡</strong>（Visa / Mastercard），效期需至少 6 個月以上，並請先向銀行確認可進行海外扣款
+        </li>
+        <li style="padding:10px 0; border-bottom:1px solid #f0f0f0; font-size:14px;">
+          🔤 <strong>身分證姓名英譯</strong>：請至外交部查詢 → <a href="https://tinyl.io/B3iy" target="_blank" style="color:#ff9900;">https://tinyl.io/B3iy</a>
+        </li>
+        <li style="padding:10px 0; border-bottom:1px solid #f0f0f0; font-size:14px;">
+          🏢 <strong>公司英文名</strong>：請至經濟部登記系統查詢 → <a href="https://tinyl.io/AYXV" target="_blank" style="color:#ff9900;">https://tinyl.io/AYXV</a>
+        </li>
+        <li style="padding:10px 0; font-size:14px;">
+          📮 <strong>公司與信用卡英文地址</strong>：請至郵局系統翻譯 → <a href="https://tinyl.io/AYXW" target="_blank" style="color:#ff9900;">https://tinyl.io/AYXW</a>
+        </li>
+      </ul>
     </div>
   </div>
 
@@ -324,9 +342,15 @@
         selectedType = btn.dataset.type;
 
         const req = docRequirements[selectedType];
-        document.getElementById('req-display').style.display = 'block';
-        document.getElementById('req-title').textContent = `📌 ${req.name} — 文件要求`;
-        document.getElementById('req-list').innerHTML = req.rules.map(r => `<li>${r}</li>`).join('');
+        
+        // Hide all category req boxes, show the relevant one
+        document.querySelectorAll('.category-req').forEach(box => box.style.display = 'none');
+        const parentCategory = btn.closest('.category');
+        const reqBox = parentCategory.querySelector('.category-req');
+        if (reqBox) {
+          reqBox.style.display = 'block';
+          reqBox.innerHTML = `<h4>📌 ${req.name} — 文件要求</h4><ul>${req.rules.map(r => '<li>' + r + '</li>').join('')}</ul>`;
+        }
 
         document.getElementById('upload-section').classList.add('active');
         document.getElementById('check-section').classList.add('active');
