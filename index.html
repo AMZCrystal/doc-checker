@@ -11,8 +11,8 @@
     .header { background: linear-gradient(135deg, #232f3e 0%, #37475a 100%); padding: 24px 40px; text-align: center; position: relative; }
     .header h1 { color: #ff9900; font-size: 22px; margin-bottom: 4px; }
     .header p { color: #ccc; font-size: 14px; }
-    .lang-toggle { position: absolute; top: 16px; right: 20px; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); color: #fff; padding: 6px 14px; border-radius: 4px; cursor: pointer; font-size: 12px; transition: all 0.2s; }
-    .lang-toggle:hover { background: rgba(255,255,255,0.25); }
+    .lang-toggle { position: absolute; top: 16px; right: 20px; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); color: #fff; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 700; transition: all 0.2s; }
+    .lang-toggle:hover { background: rgba(255,255,255,0.3); }
     .container { max-width: 960px; margin: 24px auto; padding: 0 20px; }
     .card { background: #fff; border-radius: 8px; padding: 24px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
     .card h2 { font-size: 16px; color: #232f3e; margin-bottom: 16px; border-left: 4px solid #ff9900; padding-left: 10px; }
@@ -60,7 +60,7 @@
 </head>
 <body>
   <div class="header">
-    <button class="lang-toggle" id="lang-toggle" onclick="toggleLang()">EN / 中文</button>
+    <button class="lang-toggle" id="lang-toggle">EN / 中文</button>
     <h1 id="page-title">📋 亞馬遜註冊文件檢查工具</h1>
     <p id="page-subtitle">上傳您的註冊文件，系統將自動檢查是否符合亞馬遜要求</p>
   </div>
@@ -410,8 +410,7 @@
       if (btn) btn.disabled = !(selectedType && uploadedFiles.length > 0); 
     }
 
-    // Check
-    document.getElementById('check-btn').addEventListener('click', performCheck);
+    // Check - event is now bound dynamically in doc-option click handler
 
     // OCR: Extract text from image using Tesseract.js
     async function ocrExtractText(file) {
@@ -791,7 +790,7 @@
     }
 
     // === i18n Language Toggle ===
-    let currentLang = 'zh';
+    var currentLang = 'zh';
     
     const i18n = {
       zh: {
@@ -898,6 +897,9 @@
         if (activeBtn) activeBtn.click();
       }
     }
+
+    // Bind lang toggle
+    document.getElementById('lang-toggle').addEventListener('click', toggleLang);
   </script>
 </body>
 </html>
