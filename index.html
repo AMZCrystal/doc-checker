@@ -3,14 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>亞馬遜註冊文件檢查工具</title>
+  <title>亞馬遜註冊文件檢查工具 | Amazon Registration Document Checker</title>
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Microsoft JhengHei', 'Segoe UI', Arial, sans-serif; background: #f4f6f8; color: #333; min-height: 100vh; }
-    .header { background: linear-gradient(135deg, #232f3e 0%, #37475a 100%); padding: 24px 40px; text-align: center; }
+    .header { background: linear-gradient(135deg, #232f3e 0%, #37475a 100%); padding: 24px 40px; text-align: center; position: relative; }
     .header h1 { color: #ff9900; font-size: 22px; margin-bottom: 4px; }
     .header p { color: #ccc; font-size: 14px; }
+    .lang-toggle { position: absolute; top: 16px; right: 20px; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); color: #fff; padding: 6px 14px; border-radius: 4px; cursor: pointer; font-size: 12px; transition: all 0.2s; }
+    .lang-toggle:hover { background: rgba(255,255,255,0.25); }
     .container { max-width: 960px; margin: 24px auto; padding: 0 20px; }
     .card { background: #fff; border-radius: 8px; padding: 24px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
     .card h2 { font-size: 16px; color: #232f3e; margin-bottom: 16px; border-left: 4px solid #ff9900; padding-left: 10px; }
@@ -58,17 +60,18 @@
 </head>
 <body>
   <div class="header">
-    <h1>📋 亞馬遜註冊文件檢查工具</h1>
-    <p>上傳您的註冊文件，系統將自動檢查是否符合亞馬遜要求</p>
+    <button class="lang-toggle" id="lang-toggle" onclick="toggleLang()">EN / 中文</button>
+    <h1 id="page-title">📋 亞馬遜註冊文件檢查工具</h1>
+    <p id="page-subtitle">上傳您的註冊文件，系統將自動檢查是否符合亞馬遜要求</p>
   </div>
 
   <div class="container">
     <!-- Step 1: Select Document Type -->
     <div class="card">
-      <h2>步驟一：選擇您要檢查的文件類型</h2>
+      <h2 id="step1-title">選擇您要檢查的文件類型</h2>
 
       <div class="category">
-        <div class="category-title"><span class="num">1</span>身分證件</div>
+        <div class="category-title"><span class="num">1</span><span class="cat-label">身分證件</span></div>
         <div class="doc-options">
           <button class="doc-option" data-type="national_id">國民身分證</button>
           <button class="doc-option" data-type="passport">護照</button>
@@ -77,7 +80,7 @@
       </div>
 
       <div class="category">
-        <div class="category-title"><span class="num">2</span>公司文件</div>
+        <div class="category-title"><span class="num">2</span><span class="cat-label">公司文件</span></div>
         <div class="doc-options">
           <button class="doc-option" data-type="company_setup">公司設立登記表</button>
           <button class="doc-option" data-type="company_change">公司變更登記表</button>
@@ -87,7 +90,7 @@
       </div>
 
       <div class="category">
-        <div class="category-title"><span class="num">3</span>地址驗證文件</div>
+        <div class="category-title"><span class="num">3</span><span class="cat-label">地址驗證文件</span></div>
         <div class="doc-options">
           <button class="doc-option" data-type="utility_bill">公用事業帳單（水/電/瓦斯/電信）</button>
           <button class="doc-option" data-type="address_bank">銀行對帳單（作為地址證明）</button>
@@ -96,7 +99,7 @@
       </div>
 
       <div class="category">
-        <div class="category-title"><span class="num">4</span>銀行驗證文件</div>
+        <div class="category-title"><span class="num">4</span><span class="cat-label">銀行驗證文件</span></div>
         <div class="doc-options">
           <button class="doc-option" data-type="bank_statement">銀行對帳單</button>
           <button class="doc-option" data-type="bank_passbook">銀行存摺封面</button>
@@ -109,18 +112,18 @@
 
     <!-- Preparation Tips -->
     <div class="card">
-      <h2>📝 註冊時可同步準備的資料</h2>
+      <h2 id="prep-title">📝 註冊時可同步準備的資料</h2>
       <ul style="list-style:none; padding:0; margin:0;">
-        <li style="padding:10px 0; border-bottom:1px solid #f0f0f0; font-size:14px;">
+        <li id="prep-cc" style="padding:10px 0; border-bottom:1px solid #f0f0f0; font-size:14px;">
           💳 <strong>可刷外幣的信用卡</strong>（Visa / Mastercard），效期需至少 6 個月以上，並請先向銀行確認可進行海外扣款。若卡片驗證不過，請與銀行確認是否阻擋亞馬遜刷卡
         </li>
-        <li style="padding:10px 0; border-bottom:1px solid #f0f0f0; font-size:14px;">
+        <li id="prep-name" style="padding:10px 0; border-bottom:1px solid #f0f0f0; font-size:14px;">
           🔤 <strong>身分證姓名英譯</strong>：請至外交部查詢 → <a href="https://tinyl.io/B3iy" target="_blank" style="color:#ff9900;">https://tinyl.io/B3iy</a>
         </li>
-        <li style="padding:10px 0; border-bottom:1px solid #f0f0f0; font-size:14px;">
+        <li id="prep-company" style="padding:10px 0; border-bottom:1px solid #f0f0f0; font-size:14px;">
           🏢 <strong>公司英文名</strong>：請將您的公司名稱翻譯成英文羅馬拼音後填寫，事後再以此英文公司名稱到國貿局登記申請。查詢請至經濟部登記系統 → <a href="https://tinyl.io/AYXV" target="_blank" style="color:#ff9900;">https://tinyl.io/AYXV</a>
         </li>
-        <li style="padding:10px 0; font-size:14px;">
+        <li id="prep-address" style="padding:10px 0; font-size:14px;">
           📮 <strong>公司與信用卡英文地址</strong>：請至郵局系統翻譯 → <a href="https://tinyl.io/AYXW" target="_blank" style="color:#ff9900;">https://tinyl.io/AYXW</a>
         </li>
       </ul>
@@ -128,8 +131,8 @@
   </div>
 
   <div class="footer">
-    <p>此工具僅供文件格式預檢參考，最終審核結果以亞馬遜官方為準。</p>
-    <p>© 2026 Amazon Global Selling Taiwan</p>
+    <p id="footer1">此工具僅供文件格式預檢參考，最終審核結果以亞馬遜官方為準。</p>
+    <p id="footer2">© 2026 Amazon Global Selling Taiwan</p>
   </div>
 
   <script>
@@ -785,6 +788,115 @@
       const d = new Date();
       d.setDate(d.getDate() - days);
       return d.toISOString().split('T')[0];
+    }
+
+    // === i18n Language Toggle ===
+    let currentLang = 'zh';
+    
+    const i18n = {
+      zh: {
+        title: '📋 亞馬遜註冊文件檢查工具',
+        subtitle: '上傳您的註冊文件，系統將自動檢查是否符合亞馬遜要求',
+        step1: '選擇您要檢查的文件類型',
+        cat1: '身分證件',
+        cat2: '公司文件',
+        cat3: '地址驗證文件',
+        cat4: '銀行驗證文件',
+        national_id: '國民身分證',
+        passport: '護照',
+        company_setup: '公司設立登記表',
+        company_change: '公司變更登記表',
+        business_reg: '商業登記核准函 + 商業登記抄本',
+        utility_bill: '公用事業帳單（水/電/瓦斯/電信）',
+        address_bank: '銀行對帳單（作為地址證明）',
+        bank_statement: '銀行對帳單',
+        bank_passbook: '銀行存摺封面',
+        upload: '📤 上傳文件',
+        uploadHint: '點擊或拖拉文件至此處上傳',
+        uploadFormat: '支援 JPG, PNG, PDF（單檔最大 10MB）| 須為彩色掃描',
+        checkBtn: '開始檢查文件',
+        prepTitle: '📝 註冊時可同步準備的資料',
+        creditCard: '可刷外幣的信用卡（Visa / Mastercard），效期需至少 6 個月以上，並請先向銀行確認可進行海外扣款。若卡片驗證不過，請與銀行確認是否阻擋亞馬遜刷卡',
+        nameTranslate: '身分證姓名英譯：請至外交部查詢',
+        companyName: '公司英文名：請將您的公司名稱翻譯成英文羅馬拼音後填寫，事後再以此英文公司名稱到國貿局登記申請。查詢請至經濟部登記系統',
+        address: '公司與信用卡英文地址：請至郵局系統翻譯',
+        footer1: '此工具僅供文件格式預檢參考，最終審核結果以亞馬遜官方為準。',
+        footer2: '© 2026 Amazon Global Selling Taiwan',
+        imgDisclaimer: '⚠️ 以下截圖僅供參考需求資訊，上傳資料請使用掃描完整文檔，勿用照片截圖。',
+        imgTitle: '📷 文件圖例：',
+        toggleBtn: 'EN / 中文'
+      },
+      en: {
+        title: '📋 Amazon Registration Document Checker',
+        subtitle: 'Upload your registration documents to check if they meet Amazon requirements',
+        step1: 'Select the document type to check',
+        cat1: 'Identity Documents',
+        cat2: 'Company Documents',
+        cat3: 'Address Verification',
+        cat4: 'Bank Verification',
+        national_id: 'National ID Card',
+        passport: 'Passport',
+        company_setup: 'Company Establishment Registration',
+        company_change: 'Company Change Registration',
+        business_reg: 'Business Registration Approval + Transcript',
+        utility_bill: 'Utility Bill (Water/Electric/Gas/Telecom)',
+        address_bank: 'Bank Statement (as address proof)',
+        bank_statement: 'Bank Statement',
+        bank_passbook: 'Bank Passbook Cover',
+        upload: '📤 Upload Document',
+        uploadHint: 'Click or drag files here to upload',
+        uploadFormat: 'Supports JPG, PNG, PDF (max 10MB per file) | Must be color scan',
+        checkBtn: 'Start Document Check',
+        prepTitle: '📝 Additional Information to Prepare',
+        creditCard: 'International credit card (Visa / Mastercard), valid for at least 6 months. Please confirm with your bank that overseas transactions are enabled. If card verification fails, check with your bank if Amazon charges are blocked.',
+        nameTranslate: 'English name translation: Check at Ministry of Foreign Affairs',
+        companyName: 'Company English name: Translate your company name to English romanization, then register this English name with Bureau of Foreign Trade. Check at MOEA',
+        address: 'Company & credit card English address: Translate at Chunghwa Post',
+        footer1: 'This tool is for preliminary format checking only. Final review results are subject to Amazon official verification.',
+        footer2: '© 2026 Amazon Global Selling Taiwan',
+        imgDisclaimer: '⚠️ Images below are for reference only. Please upload color-scanned complete documents, not photo screenshots.',
+        imgTitle: '📷 Document Examples:',
+        toggleBtn: '中文 / EN'
+      }
+    };
+
+    function toggleLang() {
+      currentLang = currentLang === 'zh' ? 'en' : 'zh';
+      const t = i18n[currentLang];
+      
+      document.getElementById('page-title').textContent = t.title;
+      document.getElementById('page-subtitle').textContent = t.subtitle;
+      document.getElementById('lang-toggle').textContent = t.toggleBtn;
+      document.getElementById('step1-title').textContent = t.step1;
+      
+      document.querySelectorAll('.cat-label').forEach((el, i) => {
+        const keys = ['cat1', 'cat2', 'cat3', 'cat4'];
+        el.textContent = t[keys[i]];
+      });
+      
+      document.querySelectorAll('.doc-option').forEach(btn => {
+        const type = btn.dataset.type;
+        if (t[type]) btn.textContent = t[type];
+      });
+      
+      // Update preparation tips
+      const prepEl = document.getElementById('prep-title');
+      if (prepEl) prepEl.textContent = t.prepTitle;
+      
+      document.getElementById('footer1').textContent = t.footer1;
+      document.getElementById('footer2').textContent = t.footer2;
+      
+      // Update prep items
+      document.getElementById('prep-cc').innerHTML = '💳 <strong>' + t.creditCard + '</strong>';
+      document.getElementById('prep-name').innerHTML = '🔤 <strong>' + t.nameTranslate + '</strong> → <a href="https://tinyl.io/B3iy" target="_blank" style="color:#ff9900;">https://tinyl.io/B3iy</a>';
+      document.getElementById('prep-company').innerHTML = '🏢 <strong>' + t.companyName + '</strong> → <a href="https://tinyl.io/AYXV" target="_blank" style="color:#ff9900;">https://tinyl.io/AYXV</a>';
+      document.getElementById('prep-address').innerHTML = '📮 <strong>' + t.address + '</strong> → <a href="https://tinyl.io/AYXW" target="_blank" style="color:#ff9900;">https://tinyl.io/AYXW</a>';
+      
+      // If a doc type is selected, re-render its requirements
+      if (selectedType) {
+        const activeBtn = document.querySelector('.doc-option.active');
+        if (activeBtn) activeBtn.click();
+      }
     }
   </script>
 </body>
