@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>亞馬遜註冊文件檢查工具</title>
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Microsoft JhengHei', 'Segoe UI', Arial, sans-serif; background: #f4f6f8; color: #333; min-height: 100vh; }
+    .header { background: linear-gradient(135deg, #232f3e 0%, #37475a 100%); padding: 24px 40px; text-align: center; }
+    .header h1 { color: #ff9900; font-size: 22px; margin-bottom: 4px; }
+    .header p { color: #ccc; font-size: 14px; }
+    .container { max-width: 960px; margin: 24px auto; padding: 0 20px; }
+    .card { background: #fff; border-radius: 8px; padding: 24px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .card h2 { font-size: 16px; color: #232f3e; margin-bottom: 16px; border-left: 4px solid #ff9900; padding-left: 10px; }
+    .category { margin-bottom: 24px; }
+    .category-title { font-size: 15px; font-weight: 700; color: #232f3e; margin-bottom: 10px; padding: 8px 12px; background: #f0f4f8; border-radius: 6px; }
+    .category-title .num { display: inline-block; width: 24px; height: 24px; background: #ff9900; color: #232f3e; border-radius: 50%; text-align: center; line-height: 24px; font-size: 12px; margin-right: 8px; }
+    .doc-options { display: flex; gap: 10px; flex-wrap: wrap; margin-left: 36px; }
+    .doc-option { padding: 8px 16px; border: 2px solid #e0e0e0; border-radius: 6px; background: #fff; cursor: pointer; font-size: 13px; transition: all 0.2s; }
+    .doc-option:hover { border-color: #ff9900; }
+    .doc-option.active { border-color: #ff9900; background: #fff8ee; font-weight: 700; }
+    .upload-section { display: none; margin-top: 16px; }
+    .upload-section.active { display: block; }
+    .upload-area { border: 2px dashed #ccc; border-radius: 8px; padding: 30px; text-align: center; cursor: pointer; transition: all 0.2s; }
+    .upload-area:hover { border-color: #ff9900; background: #fffdf8; }
+    .upload-area.dragover { border-color: #ff9900; background: #fff8ee; }
+    .upload-area .icon { font-size: 36px; }
+    .upload-area p { font-size: 13px; color: #666; margin-top: 6px; }
+    .file-input { display: none; }
+    .file-preview { display: flex; align-items: center; gap: 12px; padding: 10px; background: #f9f9f9; border-radius: 6px; margin-top: 10px; }
+    .file-preview .name { font-size: 13px; font-weight: 600; }
+    .file-preview .size { font-size: 11px; color: #888; }
+    .file-preview .remove { color: #d13212; cursor: pointer; margin-left: auto; font-size: 16px; }
+    .req-box { background: #f9fafb; border: 1px solid #e8e8e8; border-radius: 6px; padding: 12px 16px; margin-top: 12px; }
+    .req-box h4 { font-size: 13px; color: #ff9900; margin-bottom: 6px; }
+    .req-box li { font-size: 12px; color: #555; line-height: 1.8; }
+    .check-btn { display: block; width: 100%; padding: 14px; background: #ff9900; color: #232f3e; border: none; border-radius: 6px; font-size: 16px; font-weight: 700; cursor: pointer; transition: background 0.2s; }
+    .check-btn:hover { background: #e88b00; }
+    .check-btn:disabled { background: #ccc; cursor: not-allowed; }
+    .results-container { margin-top: 20px; }
+    .result-group { margin-bottom: 16px; border: 1px solid #e8e8e8; border-radius: 8px; overflow: hidden; }
+    .result-group-header { padding: 10px 16px; background: #f0f4f8; font-size: 14px; font-weight: 700; color: #232f3e; }
+    .result-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px 16px; border-top: 1px solid #f0f0f0; }
+    .result-item.pass { background: #f0fdf0; }
+    .result-item.fail { background: #fef2f2; }
+    .result-item.warn { background: #fffbeb; }
+    .result-item .icon { font-size: 16px; flex-shrink: 0; margin-top: 2px; }
+    .result-item .text { font-size: 13px; line-height: 1.5; }
+    .result-item .text strong { display: block; font-size: 13px; }
+    .result-summary { padding: 14px 16px; border-radius: 8px; margin-bottom: 12px; font-size: 14px; font-weight: 600; }
+    .result-summary.pass { background: #dcfce7; color: #166534; }
+    .result-summary.fail { background: #fee2e2; color: #991b1b; }
+    .result-summary.warn { background: #fef3c7; color: #92400e; }
+    .footer { text-align: center; padding: 20px; font-size: 12px; color: #888; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>📋 亞馬遜註冊文件檢查工具</h1>
+    <p>上傳您的註冊文件，系統將自動檢查是否符合亞馬遜要求</p>
+  </div>
+
+  <div class="container">
+    <!-- Step 1: Select Document Type -->
+    <div class="card">
+      <h2>步驟一：選擇您要檢查的文件類型</h2>
+
+      <div class="category">
+        <div class="category-title"><span class="num">1</span>身分證件</div>
+        <div class="doc-options">
+          <button class="doc-option" data-type="national_id">國民身分證</button>
+          <button class="doc-option" data-type="passport">護照</button>
+        </div>
+      </div>
+
+      <div class="category">
+        <div class="category-title"><span class="num">2</span>公司文件</div>
+        <div class="doc-options">
+          <button class="doc-option" data-type="company_setup">公司設立登記表</button>
+          <button class="doc-option" data-type="company_change">公司變更登記表</button>
+          <button class="doc-option" data-type="business_reg">商業登記核准函 + 商業登記抄本</button>
+        </div>
+      </div>
+
+      <div class="category">
+        <div class="category-title"><span class="num">3</span>地址驗證文件</div>
+        <div class="doc-options">
+          <button class="doc-option" data-type="utility_bill">公用事業帳單（水/電/瓦斯/電信）</button>
+          <button class="doc-option" data-type="address_bank">銀行對帳單（作為地址證明）</button>
+        </div>
+      </div>
+
+      <div class="category">
+        <div class="category-title"><span class="num">4</span>銀行驗證文件</div>
+        <div class="doc-options">
+          <button class="doc-option" data-type="bank_statement">銀行對帳單</button>
+          <button class="doc-option" data-type="bank_passbook">銀行存摺封面</button>
+        </div>
+      </div>
+
+      <!-- Requirements -->
+      <div id="req-display" class="req-box" style="display:none;">
+        <h4 id="req-title">📌 文件要求</h4>
+        <ul id="req-list"></ul>
+      </div>
+    </div>
+
+    <!-- Step 2: Upload -->
+    <div class="card upload-section" id="upload-section">
+      <h2>步驟二：上傳文件</h2>
+      <div class="upload-area" id="upload-area">
+        <div class="icon">📄</div>
+        <p>點擊或拖拉文件至此處上傳</p>
+        <p style="font-size:11px; color:#999;">支援 JPG, PNG, PDF（單檔最大 10MB）| 須為彩色掃描或彩色照片</p>
+      </div>
+      <input type="file" class="file-input" id="file-input" accept=".jpg,.jpeg,.png,.pdf" multiple>
+      <div id="file-list"></div>
+    </div>
+
+    <!-- Step 3: Check -->
+    <div class="card upload-section" id="check-section">
+      <h2>步驟三：開始檢查</h2>
+      <button class="check-btn" id="check-btn" disabled>開始檢查文件</button>
+      <div class="results-container" id="results"></div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <p>此工具僅供文件格式預檢參考，最終審核結果以亞馬遜官方為準。</p>
+    <p>© 2026 Amazon Global Selling Taiwan</p>
+  </div>
+
+  <script>
+    const docRequirements = {
+      national_id: {
+        name: '國民身分證',
+        category: '身分證件',
+        rules: [
+          '須上傳正面及反面（兩面皆需）',
+          '必須為彩色掃描，不接受黑白影印',
+          '照片清晰可辨識，無反光、遮擋、裁切或模糊',
+          '四角完整可見，不可被手指遮住',
+          '證件必須在有效期限內',
+          '姓名須與註冊帳戶一致',
+          '不接受螢幕截圖',
+          '檔案格式：JPG、PNG 或 PDF',
+          '單檔不超過 10MB'
+        ]
+      },
+      passport: {
+        name: '護照',
+        category: '身分證件',
+        rules: [
+          '必須為中華民國護照資料頁（含照片頁）',
+          '必須為彩色掃描，不接受黑白影印',
+          '護照必須在有效期限內（未過期）',
+          '照片清晰可辨識，四角完整',
+          '姓名須與註冊帳戶一致',
+          '個人賣家目前僅接受護照作為身分驗證文件',
+          '不接受螢幕截圖',
+          '檔案格式：JPG、PNG 或 PDF',
+          '單檔不超過 10MB'
+        ]
+      },
+      business_license: {
+        name: '公司設立登記表',
+        category: '公司文件',
+        rules: [
+          '必須為最新版本的公司設立登記表',
+          '必須為彩色掃描，不接受黑白影印',
+          '公司名稱須與註冊帳戶一致',
+          '統一編號清晰可見',
+          '須蓋有經濟部或縣市政府核准章',
+          '檔案格式：JPG、PNG 或 PDF',
+          '單檔不超過 10MB'
+        ]
+      },
+      company_setup: {
+        name: '公司設立登記表',
+        category: '公司文件',
+        rules: [
+          '必須為最新版本的公司設立登記表',
+          '必須為彩色掃描，不接受黑白影印',
+          '公司名稱須與註冊帳戶一致',
+          '統一編號（8碼）清晰可見',
+          '須蓋有經濟部或縣市政府核准章',
+          '不接受螢幕截圖',
+          '檔案格式：JPG、PNG 或 PDF',
+          '單檔不超過 10MB'
+        ]
+      },
+      company_change: {
+        name: '公司變更登記表',
+        category: '公司文件',
+        rules: [
+          '必須為最新版本的公司變更登記表',
+          '必須為彩色掃描，不接受黑白影印',
+          '公司名稱須與註冊帳戶一致',
+          '統一編號（8碼）清晰可見',
+          '須蓋有經濟部或縣市政府核准章',
+          '變更日期須為最近一次變更',
+          '不接受螢幕截圖',
+          '檔案格式：JPG、PNG 或 PDF',
+          '單檔不超過 10MB'
+        ]
+      },
+      business_reg: {
+        name: '商業登記核准函 + 商業登記抄本',
+        category: '公司文件',
+        rules: [
+          '須同時上傳「商業登記核准函」和「商業登記抄本」兩份文件',
+          '必須為彩色掃描，不接受黑白影印',
+          '商號名稱須與註冊帳戶一致',
+          '統一編號（8碼）清晰可見',
+          '須蓋有縣市政府核准章',
+          '營業狀態須為「營業中」',
+          '不接受螢幕截圖',
+          '檔案格式：JPG、PNG 或 PDF',
+          '單檔不超過 10MB'
+        ]
+      },
+      org_chart: {
+        name: '自我證明文件（組織結構圖）',
+        category: '公司文件',
+        rules: [
+          '須註明企業實體名稱',
+          '須確認整個企業結構（含母公司）',
+          '須顯示最終受益所有人/董事/受託人姓名',
+          '須標示各受益人持股比例',
+          '須包含受益所有人的出生日期 (DOB)',
+          '須由企業法定代表人簽署（手寫簽名）',
+          '必須為彩色掃描，不接受黑白影印',
+          '檔案格式：JPG、PNG 或 PDF',
+          '單檔不超過 10MB'
+        ]
+      },
+      authorization: {
+        name: '授權書',
+        category: '公司文件',
+        rules: [
+          '須列印在公司抬頭信箋上',
+          '須註明主要聯絡人的姓名',
+          '須由企業的受益所有人/董事/受託人簽署',
+          '僅在受益所有人與主要聯絡人非同一人時需要',
+          '必須為彩色掃描，不接受黑白影印',
+          '檔案格式：JPG、PNG 或 PDF',
+          '單檔不超過 10MB'
+        ]
+      },
+      utility_bill: {
+        name: '公用事業帳單',
+        category: '地址驗證文件',
+        rules: [
+          '必須為 90 天內開立的帳單（請確認帳單日期，注意民國年換算）',
+          '接受：水費、電費、瓦斯費、市話/固網電信帳單',
+          '須顯示帳戶持有人姓名或公司名稱',
+          '須顯示完整帳單地址',
+          '須顯示發單日期（民國年 + 1911 = 西元年）',
+          '必須為彩色掃描或正式 PDF，不接受螢幕截圖',
+          '不接受手機帳單 APP 截圖',
+          '檔案格式：JPG、PNG 或 PDF',
+          '單檔不超過 10MB'
+        ]
+      },
+      address_bank: {
+        name: '銀行對帳單（地址證明用）',
+        category: '地址驗證文件',
+        rules: [
+          '必須為 90 天內的銀行對帳單或信用卡對帳單',
+          '須顯示帳戶持有人姓名或公司名稱',
+          '須顯示銀行名稱和 LOGO',
+          '須顯示完整帳單地址',
+          '須顯示對帳單日期（民國年 + 1911 = 西元年）',
+          '不接受線上數位銀行（如 N26、Revolut）提供的文件',
+          '必須為正式 PDF 或彩色掃描，不接受螢幕截圖',
+          '檔案格式：JPG、PNG 或 PDF',
+          '單檔不超過 10MB'
+        ]
+      },
+      bank_statement: {
+        name: '銀行對帳單',
+        category: '銀行驗證文件',
+        rules: [
+          '必須為 180 天內的銀行對帳單',
+          '不接受信用卡對帳單',
+          '須顯示帳戶持有人姓名或公司名稱',
+          '須顯示銀行名稱和 LOGO',
+          '須顯示帳號後三碼（帳號末三碼須清晰可見）',
+          '須顯示對帳單日期（民國年 + 1911 = 西元年）',
+          '不接受線上數位銀行（如 N26、Revolut）提供的文件',
+          '必須為正式 PDF 或彩色掃描，不接受螢幕截圖',
+          '不接受手機 APP 截圖',
+          '檔案格式：JPG、PNG 或 PDF',
+          '單檔不超過 10MB'
+        ]
+      },
+      bank_passbook: {
+        name: '銀行存摺封面',
+        category: '銀行驗證文件',
+        rules: [
+          '必須為銀行存摺封面（含帳戶資訊頁）',
+          '必須為彩色掃描，不接受黑白影印',
+          '須顯示帳戶持有人姓名或公司名稱',
+          '須顯示銀行名稱',
+          '須顯示完整帳號',
+          '姓名須與註冊帳戶一致',
+          '不接受螢幕截圖',
+          '檔案格式：JPG、PNG 或 PDF',
+          '單檔不超過 10MB'
+        ]
+      }
+    };
+
+    let selectedType = null;
+    let uploadedFiles = [];
+
+    // Document type selection
+    document.querySelectorAll('.doc-option').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.doc-option').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        selectedType = btn.dataset.type;
+
+        const req = docRequirements[selectedType];
+        document.getElementById('req-display').style.display = 'block';
+        document.getElementById('req-title').textContent = `📌 ${req.name} — 文件要求`;
+        document.getElementById('req-list').innerHTML = req.rules.map(r => `<li>${r}</li>`).join('');
+
+        document.getElementById('upload-section').classList.add('active');
+        document.getElementById('check-section').classList.add('active');
+        updateCheckBtn();
+      });
+    });
+
+    // Upload
+    const uploadArea = document.getElementById('upload-area');
+    const fileInput = document.getElementById('file-input');
+    uploadArea.addEventListener('click', () => fileInput.click());
+    uploadArea.addEventListener('dragover', (e) => { e.preventDefault(); uploadArea.classList.add('dragover'); });
+    uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
+    uploadArea.addEventListener('drop', (e) => { e.preventDefault(); uploadArea.classList.remove('dragover'); handleFiles(e.dataTransfer.files); });
+    fileInput.addEventListener('change', (e) => handleFiles(e.target.files));
+
+    function handleFiles(files) {
+      for (let file of files) {
+        if (uploadedFiles.length >= 5) { alert('最多上傳 5 個檔案'); return; }
+        uploadedFiles.push(file);
+      }
+      renderFileList();
+      updateCheckBtn();
+    }
+
+    function renderFileList() {
+      document.getElementById('file-list').innerHTML = uploadedFiles.map((f, i) => `
+        <div class="file-preview">
+          <span>📎</span>
+          <div><div class="name">${f.name}</div><div class="size">${(f.size/1024/1024).toFixed(2)} MB</div></div>
+          <span class="remove" onclick="removeFile(${i})">✕</span>
+        </div>`).join('');
+    }
+
+    function removeFile(i) { uploadedFiles.splice(i, 1); renderFileList(); updateCheckBtn(); }
+    function updateCheckBtn() { document.getElementById('check-btn').disabled = !(selectedType && uploadedFiles.length > 0); }
+
+    // Check
+    document.getElementById('check-btn').addEventListener('click', performCheck);
+
+    // OCR: Extract text from image using Tesseract.js
+    async function ocrExtractText(file) {
+      if (!file.type.startsWith('image/')) {
+        return { text: '', dates: [], hasSignatureArea: false };
+      }
+      try {
+        const result = await Tesseract.recognize(file, 'chi_tra+eng', {
+          logger: () => {}
+        });
+        const text = result.data.text;
+        
+        // Extract dates (supports both Western and ROC calendar)
+        const dates = extractDates(text);
+        
+        return { text, dates, raw: result.data };
+      } catch (e) {
+        return { text: '', dates: [], error: e.message };
+      }
+    }
+
+    // Parse dates from OCR text (supports 民國年 and 西元年)
+    function extractDates(text) {
+      const dates = [];
+      
+      // ROC dates: 民國XXX年XX月XX日 or XXX/XX/XX or XXX.XX.XX
+      const rocPatterns = [
+        /民國\s*(\d{2,3})\s*年\s*(\d{1,2})\s*月\s*(\d{1,2})\s*日/g,
+        /中華民國\s*(\d{2,3})\s*年\s*(\d{1,2})\s*月\s*(\d{1,2})\s*日/g,
+        /(\d{2,3})\/(\d{1,2})\/(\d{1,2})/g,  // ROC format: YYY/MM/DD
+      ];
+      
+      // Western dates: YYYY/MM/DD, YYYY-MM-DD, YYYY.MM.DD
+      const westPatterns = [
+        /(\d{4})[\/\-\.](\d{1,2})[\/\-\.](\d{1,2})/g,
+        /(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{4})/g,
+      ];
+      
+      // Try ROC patterns
+      for (const pattern of rocPatterns) {
+        let match;
+        while ((match = pattern.exec(text)) !== null) {
+          const rocYear = parseInt(match[1]);
+          const month = parseInt(match[2]);
+          const day = parseInt(match[3]);
+          if (rocYear > 80 && rocYear < 200 && month >= 1 && month <= 12 && day >= 1 && day <= 31) {
+            const westYear = rocYear + 1911;
+            dates.push({ year: westYear, month, day, format: 'ROC', original: match[0] });
+          }
+        }
+      }
+      
+      // Try Western patterns
+      for (const pattern of westPatterns) {
+        let match;
+        while ((match = pattern.exec(text)) !== null) {
+          let year, month, day;
+          if (match[1].length === 4) {
+            year = parseInt(match[1]); month = parseInt(match[2]); day = parseInt(match[3]);
+          } else {
+            year = parseInt(match[3]); month = parseInt(match[1]); day = parseInt(match[2]);
+          }
+          if (year > 2000 && year < 2100 && month >= 1 && month <= 12 && day >= 1 && day <= 31) {
+            dates.push({ year, month, day, format: 'Western', original: match[0] });
+          }
+        }
+      }
+      
+      return dates;
+    }
+
+    // Check if a date is within N days from today
+    function isDateWithinDays(dateObj, days) {
+      const docDate = new Date(dateObj.year, dateObj.month - 1, dateObj.day);
+      const cutoff = new Date();
+      cutoff.setDate(cutoff.getDate() - days);
+      return docDate >= cutoff;
+    }
+
+    // Signature detection: check if passport signature area has ink
+    function detectSignature(file) {
+      return new Promise((resolve) => {
+        if (!file.type.startsWith('image/')) {
+          resolve({ hasSignature: null });
+          return;
+        }
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const img = new Image();
+          img.onload = function() {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = img.width;
+            canvas.height = img.height;
+            ctx.drawImage(img, 0, 0);
+            
+            // Passport signature is typically in the bottom 20% of the page, left 60%
+            const sigY = Math.floor(img.height * 0.75);
+            const sigH = Math.floor(img.height * 0.20);
+            const sigX = 0;
+            const sigW = Math.floor(img.width * 0.6);
+            
+            const imageData = ctx.getImageData(sigX, sigY, sigW, sigH);
+            const data = imageData.data;
+            
+            let darkPixels = 0;
+            let totalPixels = 0;
+            
+            // Count dark pixels (ink) in the signature region
+            for (let i = 0; i < data.length; i += 4) {
+              const r = data[i], g = data[i+1], b = data[i+2], a = data[i+3];
+              if (a < 128) continue;
+              totalPixels++;
+              // Dark pixel = potential ink (threshold: brightness < 80)
+              const brightness = (r + g + b) / 3;
+              if (brightness < 80) {
+                darkPixels++;
+              }
+            }
+            
+            const darkRatio = totalPixels > 0 ? darkPixels / totalPixels : 0;
+            // If signature area has more than 1% dark pixels, likely signed
+            // If less than 0.3%, likely empty/unsigned
+            resolve({ 
+              hasSignature: darkRatio > 0.008, 
+              darkRatio: darkRatio,
+              confidence: darkRatio > 0.02 ? 'high' : darkRatio > 0.008 ? 'medium' : 'low'
+            });
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    // Color detection: analyze if image is color or grayscale
+    function analyzeImageColor(file) {
+      return new Promise((resolve) => {
+        if (!file.type.startsWith('image/')) {
+          resolve({ isColor: null, reason: 'not_image' });
+          return;
+        }
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const img = new Image();
+          img.onload = function() {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            // Sample at reduced size for performance
+            const maxSize = 200;
+            const scale = Math.min(maxSize / img.width, maxSize / img.height, 1);
+            canvas.width = img.width * scale;
+            canvas.height = img.height * scale;
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const data = imageData.data;
+            let colorPixels = 0;
+            let totalPixels = 0;
+            
+            // Sample every 4th pixel for speed
+            for (let i = 0; i < data.length; i += 16) {
+              const r = data[i];
+              const g = data[i + 1];
+              const b = data[i + 2];
+              const a = data[i + 3];
+              if (a < 128) continue; // skip transparent
+              totalPixels++;
+              // Check if pixel has color (not grayscale)
+              // Grayscale: R ≈ G ≈ B (within threshold)
+              const maxDiff = Math.max(Math.abs(r - g), Math.abs(r - b), Math.abs(g - b));
+              if (maxDiff > 20) {
+                colorPixels++;
+              }
+            }
+            
+            const colorRatio = totalPixels > 0 ? colorPixels / totalPixels : 0;
+            // If less than 5% of pixels have color, it's likely grayscale/BW
+            resolve({ isColor: colorRatio > 0.05, colorRatio: colorRatio, reason: 'analyzed' });
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function performCheck() {
+      const results = document.getElementById('results');
+      results.innerHTML = '<p style="text-align:center; padding:20px;">⏳ 檢查中...（OCR 文字辨識可能需要 10-30 秒）</p>';
+
+      const req = docRequirements[selectedType];
+      let allChecks = [];
+
+      // Per-file checks
+      for (let idx = 0; idx < uploadedFiles.length; idx++) {
+        const file = uploadedFiles[idx];
+        let fileChecks = [];
+        const ext = file.name.split('.').pop().toLowerCase();
+        const sizeMB = file.size / 1024 / 1024;
+        const validFormats = ['jpg', 'jpeg', 'png', 'pdf'];
+
+        // 1. Format
+        if (validFormats.includes(ext)) {
+          fileChecks.push({ s: 'pass', t: '檔案格式正確', d: `${ext.toUpperCase()} 格式符合要求。` });
+        } else {
+          fileChecks.push({ s: 'fail', t: '❌ 檔案格式不符', d: `${ext.toUpperCase()} 不被接受。請使用 JPG、PNG 或 PDF。` });
+        }
+
+        // 2. Size
+        if (sizeMB <= 10) {
+          fileChecks.push({ s: 'pass', t: '檔案大小符合', d: `${sizeMB.toFixed(2)} MB，未超過 10MB。` });
+        } else {
+          fileChecks.push({ s: 'fail', t: '❌ 檔案過大', d: `${sizeMB.toFixed(2)} MB 超過 10MB 限制。請壓縮後重新上傳。` });
+        }
+
+        // 3. Color scan check + OCR (for images)
+        if (['jpg', 'jpeg', 'png'].includes(ext)) {
+          // Color analysis
+          const colorResult = await analyzeImageColor(file);
+          if (colorResult.isColor === true) {
+            fileChecks.push({ s: 'pass', t: '✅ 彩色文件確認', d: `偵測為彩色文件（色彩比例 ${(colorResult.colorRatio * 100).toFixed(1)}%），符合要求。` });
+          } else if (colorResult.isColor === false) {
+            fileChecks.push({ s: 'fail', t: '❌ 疑似黑白或灰階文件', d: `偵測色彩比例僅 ${(colorResult.colorRatio * 100).toFixed(1)}%，可能為黑白影印或灰階掃描。亞馬遜要求彩色掃描，請重新以彩色掃描方式上傳。` });
+          }
+
+          // OCR text extraction
+          results.innerHTML = `<p style="text-align:center; padding:20px;">⏳ 正在辨識第 ${idx+1}/${uploadedFiles.length} 個檔案的文字內容...</p>`;
+          const ocrResult = await ocrExtractText(file);
+          
+          if (ocrResult.text && ocrResult.text.length > 10) {
+            fileChecks.push({ s: 'pass', t: '✅ 文字辨識成功', d: `成功辨識 ${ocrResult.text.length} 個字元。` });
+            
+            // Date check for documents that require date validation
+            if (['utility_bill', 'address_bank', 'bank_statement'].includes(selectedType)) {
+              const requiredDays = ['utility_bill', 'address_bank'].includes(selectedType) ? 90 : 180;
+              if (ocrResult.dates.length > 0) {
+                const latestDate = ocrResult.dates.sort((a, b) => new Date(b.year, b.month-1, b.day) - new Date(a.year, a.month-1, a.day))[0];
+                const dateStr = `${latestDate.year}/${latestDate.month}/${latestDate.day}`;
+                const rocStr = `民國 ${latestDate.year - 1911} 年 ${latestDate.month} 月 ${latestDate.day} 日`;
+                
+                if (isDateWithinDays(latestDate, requiredDays)) {
+                  fileChecks.push({ s: 'pass', t: '✅ 文件日期符合要求', d: `偵測到日期：${latestDate.original}（${dateStr} / ${rocStr}），在 ${requiredDays} 天內，符合要求。` });
+                } else {
+                  fileChecks.push({ s: 'fail', t: `❌ 文件日期超過 ${requiredDays} 天`, d: `偵測到日期：${latestDate.original}（${dateStr} / ${rocStr}），已超過 ${requiredDays} 天期限。請上傳更近期的文件。` });
+                }
+              } else {
+                fileChecks.push({ s: 'warn', t: '⚠️ 未偵測到日期', d: `OCR 未能辨識文件上的日期。請人工確認文件日期是否在 ${requiredDays} 天內。` });
+              }
+            }
+            
+            // Passport expiry check
+            if (selectedType === 'passport' && ocrResult.dates.length > 0) {
+              const today = new Date();
+              const futureDates = ocrResult.dates.filter(d => new Date(d.year, d.month-1, d.day) > today);
+              if (futureDates.length > 0) {
+                const expiry = futureDates[0];
+                fileChecks.push({ s: 'pass', t: '✅ 護照有效期確認', d: `偵測到未來日期：${expiry.original}（${expiry.year}/${expiry.month}/${expiry.day}），護照可能仍在有效期內。` });
+              } else {
+                fileChecks.push({ s: 'warn', t: '⚠️ 未偵測到有效期限', d: '未找到未來日期，請人工確認護照是否仍在有效期內。' });
+              }
+            }
+            
+            // Passport signature detection
+            if (selectedType === 'passport') {
+              const sigResult = await detectSignature(file);
+              if (sigResult.hasSignature === true) {
+                fileChecks.push({ s: 'pass', t: '✅ 偵測到簽名', d: `護照簽名區域偵測到筆跡（信心度：${sigResult.confidence === 'high' ? '高' : '中'}），可能已簽名。` });
+              } else if (sigResult.hasSignature === false) {
+                fileChecks.push({ s: 'fail', t: '❌ 護照簽名欄疑似未簽名', d: '護照簽名區域未偵測到明顯筆跡。護照必須在簽名欄親筆簽名才能通過驗證。請簽名後重新以彩色掃描方式上傳。' });
+              }
+            }
+          } else {
+            fileChecks.push({ s: 'warn', t: '⚠️ 文字辨識結果有限', d: '辨識到的文字較少，可能是圖片模糊或解析度不足。請確認文件清晰度。' });
+          }
+
+          // Completeness check
+          fileChecks.push({ s: 'warn', t: '⚠️ 請確認文件完整性', d: '請確認文件四角完整、未被裁切，非局部截圖。整份文件須完整呈現。' });
+        }
+        if (ext === 'pdf') {
+          fileChecks.push({ s: 'warn', t: '⚠️ PDF 無法自動辨識', d: 'PDF 檔案目前無法進行 OCR 辨識。請確認為彩色掃描、日期在期限內、文件完整。' });
+        }
+
+        allChecks.push({ fileName: file.name, checks: fileChecks });
+      }
+
+        // Document-type specific checks
+        let docChecks = [];
+
+        // Date validation reminder
+        if (['utility_bill', 'address_bank'].includes(selectedType)) {
+          const cutoff90 = getDateBefore(90);
+          const rocYear = new Date().getFullYear() - 1911;
+          const rocCutoff = `民國 ${rocYear} 年 ${String(new Date(cutoff90).getMonth()+1).padStart(2,'0')} 月 ${String(new Date(cutoff90).getDate()).padStart(2,'0')} 日`;
+          docChecks.push({ s: 'warn', t: '⚠️ 請確認文件日期在 90 天內', d: `文件上的發單日期必須在 ${cutoff90}（${rocCutoff}）之後。如文件日期早於此日期，將不被接受。台灣文件常使用民國年，請換算確認：民國年 + 1911 = 西元年。` });
+        }
+        if (selectedType === 'bank_statement') {
+          const cutoff180 = getDateBefore(180);
+          const rocYear180 = new Date(cutoff180).getFullYear() - 1911;
+          const rocCutoff180 = `民國 ${rocYear180} 年 ${String(new Date(cutoff180).getMonth()+1).padStart(2,'0')} 月 ${String(new Date(cutoff180).getDate()).padStart(2,'0')} 日`;
+          docChecks.push({ s: 'warn', t: '⚠️ 請確認文件日期在 180 天內', d: `文件上的發單日期必須在 ${cutoff180}（${rocCutoff180}）之後。台灣文件常使用民國年，請換算確認：民國年 + 1911 = 西元年。` });
+        }
+        if (selectedType === 'passport') {
+          docChecks.push({ s: 'warn', t: '⚠️ 請確認護照未過期', d: '護照到期日必須晚於今天。過期護照將不被接受。' });
+          docChecks.push({ s: 'warn', t: '⚠️ 請確認護照已簽名', d: '護照簽名欄必須已簽名。未簽名的護照將導致驗證失敗，請在簽名欄親筆簽名後重新以彩色掃描方式上傳。' });
+          docChecks.push({ s: 'warn', t: '⚠️ 個人賣家注意', d: '個人賣家目前僅接受護照作為身分驗證文件，國民身分證不適用。' });
+        }
+        if (selectedType === 'national_id') {
+          const hasMultiple = uploadedFiles.length >= 2;
+          if (hasMultiple) {
+            docChecks.push({ s: 'pass', t: '已上傳多個檔案', d: '請確認包含身分證正面及反面。' });
+          } else {
+            docChecks.push({ s: 'fail', t: '❌ 須上傳正反兩面', d: '國民身分證需上傳正面及反面，目前僅上傳 1 個檔案。請補上另一面。' });
+          }
+        }
+        if (selectedType === 'org_chart') {
+          docChecks.push({ s: 'warn', t: '⚠️ 請確認已簽署', d: '自我證明文件須由企業法定代表人手寫簽署。未簽署的文件將被退回。' });
+          docChecks.push({ s: 'warn', t: '⚠️ 請確認結構完整', d: '須包含：企業名稱、所有受益人姓名、出生日期、持股比例。缺少任一項將被退回。' });
+        }
+        if (selectedType === 'authorization') {
+          docChecks.push({ s: 'warn', t: '⚠️ 請確認使用公司信箋', d: '授權書須列印在公司抬頭信箋上，並由受益所有人/董事簽署。' });
+        }        if (selectedType === 'business_license' || selectedType === 'company_setup' || selectedType === 'company_change') {
+          docChecks.push({ s: 'warn', t: '⚠️ 請確認為最新版本', d: '登記表須為最新版本，須蓋有經濟部或縣市政府核准章。已撤銷或廢止的公司文件不被接受。' });
+          docChecks.push({ s: 'warn', t: '⚠️ 請確認統一編號清晰', d: '統一編號（8碼）須清晰可見，模糊不清將導致審核失敗。' });
+        }
+        if (selectedType === 'business_reg') {
+          const hasMultipleFiles = uploadedFiles.length >= 2;
+          if (hasMultipleFiles) {
+            docChecks.push({ s: 'pass', t: '✅ 已上傳多個檔案', d: '請確認包含「商業登記核准函」和「商業登記抄本」兩份文件。' });
+          } else {
+            docChecks.push({ s: 'fail', t: '❌ 須上傳兩份文件', d: '商業登記需同時上傳「商業登記核准函」和「商業登記抄本」，目前僅上傳 1 個檔案。' });
+          }
+          docChecks.push({ s: 'warn', t: '⚠️ 請確認營業狀態', d: '營業狀態須為「營業中」。已撤銷或廢止的商號文件不被接受。' });
+          docChecks.push({ s: 'warn', t: '⚠️ 請確認統一編號清晰', d: '統一編號（8碼）須清晰可見，模糊不清將導致審核失敗。' });
+        }
+
+        // Render results
+        let hasFailure = false;
+        let html = '';
+
+        // Per-file results
+        allChecks.forEach(fc => {
+          html += `<div class="result-group">`;
+          html += `<div class="result-group-header">📎 ${fc.fileName}</div>`;
+          fc.checks.forEach(c => {
+            if (c.s === 'fail') hasFailure = true;
+            html += `<div class="result-item ${c.s}"><span class="icon">${c.s==='pass'?'✅':c.s==='fail'?'❌':'⚠️'}</span><div class="text"><strong>${c.t}</strong>${c.d}</div></div>`;
+          });
+          html += `</div>`;
+        });
+
+        // Document-level results
+        if (docChecks.length > 0) {
+          html += `<div class="result-group">`;
+          html += `<div class="result-group-header">📋 ${req.name} — 文件內容檢查</div>`;
+          docChecks.forEach(c => {
+            if (c.s === 'fail') hasFailure = true;
+            html += `<div class="result-item ${c.s}"><span class="icon">${c.s==='pass'?'✅':c.s==='fail'?'❌':'⚠️'}</span><div class="text"><strong>${c.t}</strong>${c.d}</div></div>`;
+          });
+          html += `</div>`;
+        }
+
+        // Summary
+        let summary;
+        if (hasFailure) {
+          summary = `<div class="result-summary fail">❌ 文件有不符合項目，請修正紅色標記的問題後重新上傳。</div>`;
+        } else {
+          summary = `<div class="result-summary warn">⚠️ 格式基本符合，請逐一確認黃色提醒項目後再提交給亞馬遜。</div>`;
+        }
+
+        results.innerHTML = summary + html;
+    }
+
+    function getDateBefore(days) {
+      const d = new Date();
+      d.setDate(d.getDate() - days);
+      return d.toISOString().split('T')[0];
+    }
+  </script>
+</body>
+</html>
