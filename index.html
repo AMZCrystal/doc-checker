@@ -891,6 +891,9 @@
       currentLang = currentLang === 'zh' ? 'en' : 'zh';
       const t = i18n[currentLang];
       
+      // Switch font based on language
+      document.body.style.fontFamily = currentLang === 'en' ? "Calibri, 'Segoe UI', Arial, sans-serif" : "'Microsoft JhengHei', 'Segoe UI', Arial, sans-serif";
+      
       document.getElementById('page-title').textContent = t.title;
       document.getElementById('page-subtitle').textContent = t.subtitle;
       document.getElementById('lang-toggle').textContent = t.toggleBtn;
