@@ -105,26 +105,26 @@
       </div>
 
       <!-- Remove old req-display -->
-    </div>
-
-    <!-- Step 2: Upload -->
-    <div class="card upload-section" id="upload-section">
-      <h2>步驟二：上傳文件</h2>
-      <div class="upload-area" id="upload-area">
-        <div class="icon">📄</div>
-        <p>點擊或拖拉文件至此處上傳</p>
-        <p style="font-size:11px; color:#999;">支援 JPG, PNG, PDF（單檔最大 10MB）| 須為彩色掃描或彩色照片</p>
+      
+      <!-- Upload area (appears after selecting doc type) -->
+      <div class="upload-section" id="upload-section" style="margin-top:16px;">
+        <div style="font-size:14px; font-weight:700; color:#232f3e; margin-bottom:8px;">📤 上傳文件</div>
+        <div class="upload-area" id="upload-area">
+          <div class="icon">📄</div>
+          <p>點擊或拖拉文件至此處上傳</p>
+          <p style="font-size:11px; color:#999;">支援 JPG, PNG, PDF（單檔最大 10MB）| 須為彩色掃描</p>
+        </div>
+        <input type="file" class="file-input" id="file-input" accept=".jpg,.jpeg,.png,.pdf" multiple>
+        <div id="file-list"></div>
       </div>
-      <input type="file" class="file-input" id="file-input" accept=".jpg,.jpeg,.png,.pdf" multiple>
-      <div id="file-list"></div>
+
+      <!-- Check button (appears after upload) -->
+      <div class="upload-section" id="check-section" style="margin-top:16px;">
+        <button class="check-btn" id="check-btn" disabled>開始檢查文件</button>
+        <div class="results-container" id="results"></div>
+      </div>
     </div>
 
-    <!-- Step 3: Check -->
-    <div class="card upload-section" id="check-section">
-      <h2>步驟三：開始檢查</h2>
-      <button class="check-btn" id="check-btn" disabled>開始檢查文件</button>
-      <div class="results-container" id="results"></div>
-    </div>
     <!-- Preparation Tips -->
     <div class="card">
       <h2>📝 註冊時可同步準備的資料</h2>
@@ -335,13 +335,13 @@
     let uploadedFiles = [];
 
     const docImages = {
-      national_id: ['images/slide7_img1.png'],
-      passport: ['images/slide7_img2.png'],
+      national_id: ['images/slide7_img2.png'],
+      passport: ['images/passport_sample.png'],
       company_setup: ['images/slide8_img5.png'],
       company_change: ['images/slide8_img5.png'],
       business_reg: ['images/slide8_img3.png', 'images/slide8_img4.png'],
       utility_bill: [],
-      address_bank: ['images/slide9_img6.png'],
+      address_bank: ['images/slide31_img23.png'],
       bank_statement: ['images/bank_statement_sample.png'],
       bank_passbook: ['images/bank_passbook_sample.png']
     };
@@ -364,7 +364,7 @@
           reqBox.style.display = 'block';
           let imgHtml = '';
           if (imgs.length > 0) {
-            imgHtml = '<div style="margin-top:12px;"><strong style="font-size:13px;">📷 文件圖例：</strong><div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:8px;">' +
+            imgHtml = '<div style="margin-top:12px;"><strong style="font-size:13px;">📷 文件圖例：</strong><p style="font-size:11px; color:#d13212; margin:4px 0;">⚠️ 以下截圖僅供參考需求資訊，上傳資料請使用掃描完整文檔，勿用照片截圖。</p><div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:8px;">' +
               imgs.map(src => `<img src="${src}" style="max-width:280px; border:1px solid #ddd; border-radius:4px; cursor:pointer;" onclick="window.open('${src}','_blank')" title="點擊放大">`).join('') +
               '</div></div>';
           }
