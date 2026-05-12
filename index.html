@@ -130,13 +130,13 @@
       <h2>📝 註冊時可同步準備的資料</h2>
       <ul style="list-style:none; padding:0; margin:0;">
         <li style="padding:10px 0; border-bottom:1px solid #f0f0f0; font-size:14px;">
-          💳 <strong>可刷外幣的信用卡</strong>（Visa / Mastercard），效期需至少 6 個月以上，並請先向銀行確認可進行海外扣款
+          💳 <strong>可刷外幣的信用卡</strong>（Visa / Mastercard），效期需至少 6 個月以上，並請先向銀行確認可進行海外扣款。若卡片驗證不過，請與銀行確認是否阻擋亞馬遜刷卡
         </li>
         <li style="padding:10px 0; border-bottom:1px solid #f0f0f0; font-size:14px;">
           🔤 <strong>身分證姓名英譯</strong>：請至外交部查詢 → <a href="https://tinyl.io/B3iy" target="_blank" style="color:#ff9900;">https://tinyl.io/B3iy</a>
         </li>
         <li style="padding:10px 0; border-bottom:1px solid #f0f0f0; font-size:14px;">
-          🏢 <strong>公司英文名</strong>：請至經濟部登記系統查詢 → <a href="https://tinyl.io/AYXV" target="_blank" style="color:#ff9900;">https://tinyl.io/AYXV</a>
+          🏢 <strong>公司英文名</strong>：請將您的公司名稱翻譯成英文羅馬拼音後填寫，事後再以此英文公司名稱到國貿局登記申請。查詢請至經濟部登記系統 → <a href="https://tinyl.io/AYXV" target="_blank" style="color:#ff9900;">https://tinyl.io/AYXV</a>
         </li>
         <li style="padding:10px 0; font-size:14px;">
           📮 <strong>公司與信用卡英文地址</strong>：請至郵局系統翻譯 → <a href="https://tinyl.io/AYXW" target="_blank" style="color:#ff9900;">https://tinyl.io/AYXW</a>
@@ -334,6 +334,18 @@
     let selectedType = null;
     let uploadedFiles = [];
 
+    const docImages = {
+      national_id: ['images/slide7_img1.png'],
+      passport: ['images/slide7_img2.png'],
+      company_setup: ['images/slide8_img5.png'],
+      company_change: ['images/slide8_img5.png'],
+      business_reg: ['images/slide8_img3.png', 'images/slide8_img4.png'],
+      utility_bill: [],
+      address_bank: ['images/slide9_img6.png'],
+      bank_statement: ['images/bank_statement_sample.png'],
+      bank_passbook: ['images/bank_passbook_sample.png']
+    };
+
     // Document type selection
     document.querySelectorAll('.doc-option').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -342,6 +354,7 @@
         selectedType = btn.dataset.type;
 
         const req = docRequirements[selectedType];
+        const imgs = docImages[selectedType] || [];
         
         // Hide all category req boxes, show the relevant one
         document.querySelectorAll('.category-req').forEach(box => box.style.display = 'none');
@@ -349,7 +362,13 @@
         const reqBox = parentCategory.querySelector('.category-req');
         if (reqBox) {
           reqBox.style.display = 'block';
-          reqBox.innerHTML = `<h4>📌 ${req.name} — 文件要求</h4><ul>${req.rules.map(r => '<li>' + r + '</li>').join('')}</ul>`;
+          let imgHtml = '';
+          if (imgs.length > 0) {
+            imgHtml = '<div style="margin-top:12px;"><strong style="font-size:13px;">📷 文件圖例：</strong><div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:8px;">' +
+              imgs.map(src => `<img src="${src}" style="max-width:280px; border:1px solid #ddd; border-radius:4px; cursor:pointer;" onclick="window.open('${src}','_blank')" title="點擊放大">`).join('') +
+              '</div></div>';
+          }
+          reqBox.innerHTML = `<h4>📌 ${req.name} — 文件要求</h4><ul>${req.rules.map(r => '<li>' + r + '</li>').join('')}</ul>${imgHtml}`;
         }
 
         document.getElementById('upload-section').classList.add('active');
