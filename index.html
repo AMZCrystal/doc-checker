@@ -2,6 +2,15 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8">
+  <!-- GA4 -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SJ6WFCF2N8"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag("js", new Date());
+    gtag("config", "G-SJ6WFCF2N8");
+  </script>
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>亞馬遜註冊文件檢查工具 | Amazon Registration Document Checker</title>
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -130,6 +139,9 @@
     </div>
   </div>
 
+    <div class="card" style="background:#f0fdf0; border:1px solid #86efac;">
+      <p style="font-size:13px; color:#166534; margin:0;" id="privacy-notice">🔒 隱私保護：您上傳的文件僅在您的瀏覽器中進行本地分析，不會上傳至任何伺服器，關閉頁面後所有資料即自動清除。</p>
+    </div>
   <div class="footer">
     <p id="footer1">此工具僅供文件格式預檢參考，最終審核結果以亞馬遜官方為準。</p>
     <p id="footer2">© 2026 Amazon Global Selling Taiwan</p>
@@ -354,19 +366,19 @@
               imgs.map(src => `<img src="${src}" style="max-width:280px; border:1px solid #ddd; border-radius:4px; cursor:pointer;" onclick="window.open('${src}','_blank')" title="點擊放大">`).join('') +
               '</div></div>';
           }
-          reqBox.innerHTML = `<h4>📌 ${req.name} — 文件要求</h4><ul>${req.rules.map(r => '<li>' + r + '</li>').join('')}</ul>${imgHtml}
+          reqBox.innerHTML = `<h4>📌 ${currentLang === 'en' && docRequirements_en[selectedType] ? docRequirements_en[selectedType].name + ' — Requirements' : req.name + ' — 文件要求'}</h4><ul>${(currentLang === 'en' && docRequirements_en[selectedType] ? docRequirements_en[selectedType].rules : req.rules).map(r => '<li>' + r + '</li>').join('')}</ul>${imgHtml}
             <div style="margin-top:16px;">
-              <div style="font-size:14px; font-weight:700; color:#232f3e; margin-bottom:8px;">📤 上傳文件</div>
+              <div style="font-size:14px; font-weight:700; color:#232f3e; margin-bottom:8px;">${currentLang === 'en' ? '📤 Upload Document' : '📤 上傳文件'}</div>
               <div class="upload-area" id="upload-area">
                 <div class="icon">📄</div>
-                <p>點擊或拖拉文件至此處上傳</p>
-                <p style="font-size:11px; color:#999;">支援 JPG, PNG, PDF（單檔最大 10MB）| 須為彩色掃描</p>
+                <p>${currentLang === 'en' ? 'Click or drag files here to upload' : '點擊或拖拉文件至此處上傳'}</p>
+                <p style="font-size:11px; color:#999;">${currentLang === 'en' ? 'JPG, PNG, PDF (max 10MB) | Color scan required' : '支援 JPG, PNG, PDF（單檔最大 10MB）| 須為彩色掃描'}</p>
               </div>
               <input type="file" class="file-input" id="file-input" accept=".jpg,.jpeg,.png,.pdf" multiple>
               <div id="file-list"></div>
             </div>
             <div style="margin-top:16px;">
-              <button class="check-btn" id="check-btn" disabled>開始檢查文件</button>
+              <button class="check-btn" id="check-btn" disabled>${currentLang === 'en' ? 'Start Document Check' : '開始檢查文件'}</button>
               <div class="results-container" id="results"></div>
             </div>`;
           
@@ -393,6 +405,7 @@
       }
       renderFileList();
       updateCheckBtn();
+      if (typeof gtag !== 'undefined') { gtag('event', 'file_upload', {'doc_type': selectedType, 'file_count': uploadedFiles.length}); }
     }
 
     function renderFileList() {
@@ -789,6 +802,19 @@
       return d.toISOString().split('T')[0];
     }
 
+
+    const docRequirements_en = {
+      national_id: { name: 'National ID Card', rules: ['\u26a0\ufe0f Note: Individual sellers can only use passport. National ID is for business-type sellers only.','Must upload both front and back sides','Must be a color scan, B&W not accepted','Clear and legible, no glare/obstruction/cropping','All four corners fully visible','Name must match registered account','Screenshots not accepted','Format: JPG, PNG or PDF','Max size: 10MB'] },
+      passport: { name: 'Passport', rules: ['Must be ROC (Taiwan) passport data page (with photo)','Must be a color scan, B&W not accepted','Passport must be valid (not expired)','Clear and legible, all corners visible','Name must match registered account','Individual sellers: only passport accepted for ID verification','Screenshots not accepted','Format: JPG, PNG or PDF','Max size: 10MB'] },
+      company_setup: { name: 'Company Establishment Registration', rules: ['Must be latest version','Must be a color scan, B&W not accepted','Company name must match registered account','UBN (8 digits) clearly visible','Must have MOEA/local govt approval stamp','Screenshots not accepted','Format: JPG, PNG or PDF','Max size: 10MB'] },
+      company_change: { name: 'Company Change Registration', rules: ['Must be latest version','Must be a color scan, B&W not accepted','Company name must match registered account','UBN (8 digits) clearly visible','Must have MOEA/local govt approval stamp','Must be most recent change','Screenshots not accepted','Format: JPG, PNG or PDF','Max size: 10MB'] },
+      business_reg: { name: 'Business Reg. Approval + Transcript', rules: ['Must upload BOTH approval letter AND transcript','Must be a color scan, B&W not accepted','Business name must match registered account','UBN (8 digits) clearly visible','Must have local govt approval stamp','Status must be Active','Screenshots not accepted','Format: JPG, PNG or PDF','Max size: 10MB'] },
+      utility_bill: { name: 'Utility Bill', rules: ['Must be issued within last 90 days','Accepted: water, electricity, gas, landline telecom','Must show account holder/company name','Must show complete billing address','Must show issue date (ROC year + 1911 = Western year)','Must be color scan or official PDF, no screenshots','Mobile app screenshots not accepted','Format: JPG, PNG or PDF','Max size: 10MB'] },
+      address_bank: { name: 'Bank Statement (address proof)', rules: ['Must be issued within last 90 days','Must show account holder/company name','Must show bank name and logo','Must show complete billing address','Must show statement date','Online digital banks (N26, Revolut) not accepted','Must be official PDF or color scan, no screenshots','Format: JPG, PNG or PDF','Max size: 10MB'] },
+      bank_statement: { name: 'Bank Statement', rules: ['Must be issued within last 180 days','Credit card statements NOT accepted','Must show account holder/company name','Must show bank name and logo','Must show last 3 digits of account number','Must show statement date','Online digital banks (N26, Revolut) not accepted','Must be official PDF or color scan, no screenshots','Mobile app screenshots not accepted','Format: JPG, PNG or PDF','Max size: 10MB'] },
+      bank_passbook: { name: 'Bank Passbook Cover', rules: ['Must be passbook cover page (with account info)','Must be a color scan, B&W not accepted','Must show account holder/company name','Must show bank name','Must show complete account number','Name must match registered account','Screenshots not accepted','Format: JPG, PNG or PDF','Max size: 10MB'] }
+    };
+
     // === i18n Language Toggle ===
     var currentLang = 'zh';
     
@@ -891,6 +917,9 @@
       document.getElementById('prep-company').innerHTML = '🏢 <strong>' + t.companyName + '</strong> → <a href="https://tinyl.io/AYXV" target="_blank" style="color:#ff9900;">https://tinyl.io/AYXV</a>';
       document.getElementById('prep-address').innerHTML = '📮 <strong>' + t.address + '</strong> → <a href="https://tinyl.io/AYXW" target="_blank" style="color:#ff9900;">https://tinyl.io/AYXW</a>';
       
+      // Update privacy
+      const privacyEl = document.getElementById('privacy-notice');
+      if (privacyEl) privacyEl.textContent = currentLang === 'en' ? '\U0001f512 Privacy: Files are analyzed locally in your browser only. No data is sent to any server. All data is cleared when you close the page.' : '\U0001f512 \u96b1\u79c1\u4fdd\u8b77\uff1a\u60a8\u4e0a\u50b3\u7684\u6587\u4ef6\u50c5\u5728\u60a8\u7684\u700f\u89bd\u5668\u4e2d\u9032\u884c\u672c\u5730\u5206\u6790\uff0c\u4e0d\u6703\u4e0a\u50b3\u81f3\u4efb\u4f55\u4f3a\u670d\u5668\uff0c\u95dc\u9589\u9801\u9762\u5f8c\u6240\u6709\u8cc7\u6599\u5373\u81ea\u52d5\u6e05\u9664\u3002';
       // If a doc type is selected, re-render its requirements
       if (selectedType) {
         const activeBtn = document.querySelector('.doc-option.active');
