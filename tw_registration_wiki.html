@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TW Registration Knowledge Base</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Microsoft JhengHei', 'Segoe UI', Arial, sans-serif; background: #f4f6f8; color: #333; min-height: 100vh; }
+    .header { background: linear-gradient(135deg, #232f3e 0%, #37475a 100%); padding: 20px 40px; text-align: center; }
+    .header h1 { color: #ff9900; font-size: 20px; margin-bottom: 4px; }
+    .header p { color: #ccc; font-size: 13px; }
+    .container { max-width: 960px; margin: 20px auto; padding: 0 20px; }
+    .search-box { width: 100%; padding: 14px 20px; font-size: 15px; border: 2px solid #ddd; border-radius: 8px; margin-bottom: 16px; outline: none; transition: border 0.2s; }
+    .search-box:focus { border-color: #ff9900; }
+    .category-nav { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+    .cat-btn { padding: 8px 14px; border: 1px solid #ddd; border-radius: 20px; background: #fff; cursor: pointer; font-size: 12px; transition: all 0.2s; }
+    .cat-btn:hover, .cat-btn.active { background: #ff9900; color: #232f3e; border-color: #ff9900; font-weight: 700; }
+    .card { background: #fff; border-radius: 8px; padding: 20px; margin-bottom: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); border-left: 4px solid #ff9900; cursor: pointer; transition: all 0.2s; }
+    .card:hover { box-shadow: 0 3px 12px rgba(0,0,0,0.1); }
+    .card h3 { font-size: 15px; color: #232f3e; margin-bottom: 6px; }
+    .card .tag { display: inline-block; font-size: 11px; background: #f0f4f8; color: #555; padding: 2px 8px; border-radius: 10px; margin-right: 4px; margin-bottom: 4px; }
+    .card .content { display: none; margin-top: 12px; font-size: 13px; line-height: 1.8; color: #444; border-top: 1px solid #f0f0f0; padding-top: 12px; }
+    .card .content.open { display: block; }
+    .card .content a { color: #ff9900; word-break: break-all; }
+    .card .content ul { margin-left: 16px; margin-top: 6px; }
+    .card .content li { margin-bottom: 4px; }
+    .card .content pre { background: #f9f9f9; padding: 10px; border-radius: 4px; font-size: 12px; overflow-x: auto; white-space: pre-wrap; margin: 8px 0; }
+    .no-results { text-align: center; padding: 40px; color: #888; font-size: 14px; }
+    .footer { text-align: center; padding: 20px; font-size: 11px; color: #888; }
+    .highlight { background: #fff3cd; padding: 0 2px; border-radius: 2px; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>📚 TW Registration Knowledge Base</h1>
+    <p>Interactive search for registration escalation SOPs and troubleshooting</p>
+  </div>
+
+  <div class="container">
+    <input type="text" class="search-box" id="search" placeholder="🔍 搜尋關鍵字... (e.g. SIV, IPV, credit card, KYC, duplicate, bank statement)">
+    
+    <div class="category-nav" id="cat-nav">
+      <button class="cat-btn active" data-cat="all">All</button>
+      <button class="cat-btn" data-cat="escalation">Escalation</button>
+      <button class="cat-btn" data-cat="siv">SIV</button>
+      <button class="cat-btn" data-cat="ipv">IPV/VSV/I2V</button>
+      <button class="cat-btn" data-cat="bav">BAV/Bank</button>
+      <button class="cat-btn" data-cat="documents">Documents</button>
+      <button class="cat-btn" data-cat="tech">Tech Issues</button>
+      <button class="cat-btn" data-cat="ca-kyc">CA KYC</button>
+      <button class="cat-btn" data-cat="tools">Tools</button>
+    </div>
+
+    <div id="results"></div>
+  </div>
+
+  <div class="footer">
+    <p>Source: <a href="https://w.amazon.com/bin/view/TWRegistration" style="color:#ff9900;">TWRegistration Wiki</a> | Primary Contact: isanlin@ | Last updated: 2026/04</p>
+  </div>
+
+  <script>
+    const knowledgeBase = [
+      {
+        title: 'Registration Issue Escalation SOP (General Flow)',
+        category: 'escalation',
+        tags: ['escalation', 'SOP', 'funnel', 'SIV'],
+        content: `<strong>Flow:</strong>
+<ol>
+<li>Seller create case</li>
+<li>AE/BD issue internal SIV escalation</li>
+<li>Based on SIV escalation feedback for further escalation</li>
+<li>Check the escalation channel for further escalation</li>
+<li>Input in escalation quip to funnel team</li>
+</ol>
+<p><strong>Important:</strong> Please check if the seller company under normal business status at <a href="https://etax.nat.gov.tw" target="_blank">etax.nat.gov.tw</a></p>`
+      },
+      {
+        title: 'SIV Escalation Channel',
+        category: 'siv',
+        tags: ['SIV', 'escalation', 'email', 'office hour'],
+        content: `<p><strong>SIV escalation wiki:</strong> <a href="https://w.amazon.com/bin/view/Siv_escalation/internal_escalation_channel" target="_blank">Link</a></p>
+<p><strong>If SIV escalation email fails:</strong> Join SIV office hour (select SIV CN for TW seller)</p>
+<p><strong>If still unresolved:</strong> Fill in funnel escalation quip → inform Crystal or NA POC: Kai → join TW funnel office hr every Friday 11am</p>
+<p><em>Office hr will be cancelled if no sign up case by every Thur EOD.</em></p>
+<p><strong>SIV Office Hour (every 2 weeks, Wed 3pm TW):</strong></p>
+<ul>
+<li>Zoom: <a href="https://amazon.zoom.us/j/96403950790?pwd=9Wl3HBqnJqgbaZ4zIm7x5PuViDQm8l.1" target="_blank">Join</a></li>
+<li>Meeting ID: 964 0395 0790</li>
+<li>Passcode: 33443479</li>
+<li>Must have already raised case to siv-internal-escalations-cn@amazon.com</li>
+<li>Log query into quip before joining</li>
+</ul>`
+      },
+      {
+        title: 'Duplicate Account - Multiple Account Registration (from 2025/4/30)',
+        category: 'siv',
+        tags: ['duplicate', 'multiple account', 'FIRE', 'registration failure'],
+        content: `<p>From 2025/4/30, sellers who already have an Amazon account and attempt to register another will receive: <strong>"We have noticed that you have multiple Amazon seller accounts."</strong></p>
+<p><strong>Reference:</strong> Multiple Account Registration Process Optimization FAQ - Amazon Internal Guidance</p>`
+      },
+      {
+        title: 'I2V / VSV Escalation (錄影或拍照驗證)',
+        category: 'ipv',
+        tags: ['I2V', 'VSV', 'video', 'escalation', 'IPV'],
+        content: `<p><strong>SIM to IPV CTI:</strong></p>
+<ul>
+<li>Category: compliance</li>
+<li>Type: In-person Video</li>
+<li>Item: Escalation</li>
+<li>Group: IPV GPO</li>
+</ul>
+<p><strong>Email:</strong> <a href="mailto:ipv-row-complaints@amazon.com">ipv-row-complaints@amazon.com</a></p>`
+      },
+      {
+        title: 'BIV / AV / LOA Escalation',
+        category: 'siv',
+        tags: ['BIV', 'AV', 'LOA', 'address verification', 'escalation'],
+        content: `<p><strong>First:</strong> Seller should follow email guidance to reach Seller Support.</p>
+<p><strong>If unresolved, AM can:</strong></p>
+<ol>
+<li>SIV escalation channel: <a href="https://w.amazon.com/bin/view/Siv_escalation/internal_escalation_channel" target="_blank">Link</a></li>
+<li>Register product team office hour: <a href="https://office-hour-scheduler.tools.aws.dev/schedule/ca0ffb2a-3adc-4b1e-b5b0-d2744625562f" target="_blank">Link</a></li>
+</ol>`
+      },
+      {
+        title: 'BAV / CVV Escalation (銀行帳單/信用卡)',
+        category: 'bav',
+        tags: ['BAV', 'CVV', 'bank statement', 'credit card', 'payment', 'escalation'],
+        content: `<p><strong>First:</strong> Seller should follow email guidance to reach Seller Support.</p>
+<p><strong>If unresolved, AM can:</strong></p>
+<ol>
+<li>Email: <a href="mailto:payment-instrument-product-escalations@amazon.com">payment-instrument-product-escalations@amazon.com</a> with CID/marketplace/what happened/asking</li>
+<li>SIM: <a href="https://t.corp.amazon.com/create/templates/fb6d8c09-f2aa-4375-8ce6-99a65f6ba57e" target="_blank">Template</a></li>
+<li>Slack: <a href="https://amazon.enterprise.slack.com/archives/C094XTFB1B2" target="_blank">Channel</a></li>
+<li>Office hours: <a href="https://office-hour-scheduler.tools.aws.dev/schedule/0b880067-d114-456d-91a6-197deb218d79" target="_blank">Link</a></li>
+</ol>`
+      },
+      {
+        title: 'BAV - Bank Statement Requirements',
+        category: 'bav',
+        tags: ['BAV', 'bank statement', 'requirements', 'document'],
+        content: `<p>Bank statement must show:</p>
+<ol>
+<li><strong>Name:</strong> business owner / company name / overseas company primary contact (EU needs company name)</li>
+<li><strong>Issue date:</strong> within 180 days</li>
+<li><strong>Account number:</strong> last 3 digits must match system, others can be masked</li>
+<li><strong>Bank name/logo</strong> or bank address</li>
+<li><strong>Format:</strong> Electronic or paper, must be full document (not piece of pic)</li>
+</ol>
+<p><strong>Q: Can cover the amount?</strong> YES, but only amount can be covered. Need to show other words besides amount.</p>
+<p><strong>Q: Overseas company with TW bank?</strong> YES, can submit TW bank info with TW bank statement.</p>
+<p><strong>Note:</strong> No need seller's address. Don't cover other words besides amount.</p>`
+      },
+      {
+        title: 'Credit Card Rejected by System - Escalation SOP',
+        category: 'bav',
+        tags: ['credit card', 'rejected', 'payment', 'escalation'],
+        content: `<p><strong>Issue:</strong> Seller's credit card keeps being rejected, even after changing cards.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li>Confirm seller has tried different cards</li>
+<li>Email to: <a href="mailto:payment-instrument-product-escalations@amazon.com">payment-instrument-product-escalations@amazon.com</a></li>
+</ol>
+<pre>CID:
+Marketplace:
+What happened:
+What's the asking:</pre>
+<p><strong>SLA:</strong> ~1-2 days</p>`
+      },
+      {
+        title: 'Accepted Company Documents (SIV)',
+        category: 'documents',
+        tags: ['SIV', 'documents', 'company', 'business license', '設立登記表', '變更登記表'],
+        content: `<p><strong>公司法 Companies:</strong></p>
+<ul>
+<li>有限公司設立登記表 / 有限公司變更登記表</li>
+<li>股份有限公司設立登記表 / 股份有限公司變更登記表</li>
+<li>閉鎖型股份有限公司設立登記表 / 閉鎖型股份有限公司變更登記表</li>
+<li>無限公司設立登記表 / 無限公司變更登記表</li>
+<li>兩合公司設立登記表 / 兩合公司變更登記表</li>
+</ul>
+<p><strong>Non-corporate entity:</strong></p>
+<ul>
+<li>有限合夥設立登記表 / 有限合夥變更登記表 (有限合夥法)</li>
+<li>商號/合夥(企業社、工作室、商行) - 商業登記法: 商業登記核准函 + 商業登記抄本</li>
+</ul>
+<p><strong>Updated:</strong> Increased to 10+ business license types since 2022/4/4</p>`
+      },
+      {
+        title: 'LOA (Letter Of Authorization) - Overseas Company',
+        category: 'documents',
+        tags: ['LOA', 'authorization', 'overseas', 'document'],
+        content: `<p><strong>For overseas company with Primary Contact who isn't business owner.</strong></p>
+<p>The LOA must meet:</p>
+<ul>
+<li>Signed by legal representative or beneficial owner</li>
+<li>Issued within past 180 days</li>
+<li>Not a screenshot</li>
+<li>If handwritten, must be clear and legible</li>
+</ul>
+<p><strong>MVB LOA reference:</strong> See quip template and example.</p>`
+      },
+      {
+        title: 'IPV (In-Person Verification)',
+        category: 'ipv',
+        tags: ['IPV', 'in-person', 'verification', 'bypass', 'escalation'],
+        content: `<p><strong>Status:</strong> Dialed up 100% for TW NSR on 2021/11/11, deprecated in 2024 (replaced by VSV/I2V).</p>
+<p><strong>Current flow:</strong> Seller fails VSV/I2V → gets appeal email to schedule IPV.</p>
+<p><strong>If no appeal email received:</strong> AM email to <a href="mailto:ipv-row-complaints@amazon.com">ipv-row-complaints@amazon.com</a></p>
+<pre>Seller/Customer ID:
+Registered Email:
+Marketplace:
+Current SIV status(Pass/Pending/Deny/Other):
+Has the seller submitted all requested documents? (Y/N):
+Has the seller responded to all information requested? (Y/N):
+Document(s) the seller is having difficulty with:
+Describe the support you require from IPV:</pre>
+<p><strong>IPV Bypass criteria:</strong> Business owner with original ID and business license in different places (can't support 2 participants). AM needs L7 approval + seller schedules IPV first + SIM via River link (IPV Specific Request >> By-pass).</p>`
+      },
+      {
+        title: 'CA KYC Escalation',
+        category: 'ca-kyc',
+        tags: ['CA', 'KYC', 'Canada', 'verification', 'escalation'],
+        content: `<p><strong>Reference:</strong> <a href="https://w.amazon.com/bin/view/CA-KYC/" target="_blank">CA-KYC Wiki</a></p>
+<p><strong>Email to:</strong> <a href="mailto:kyc-escalation-internal-cn@amazon.ca">kyc-escalation-internal-cn@amazon.ca</a></p>
+<pre>Token id:
+MCID:
+Submit time:
+Registered Email:
+Marketplace: CA
+Current SIV status(Pass/Pending/Deny/Other):
+Has the seller submitted all requested documents? (Y/N):
+Has the seller responded to all information requested? (Y/N):
+Document(s) the seller is having difficulty with:
+Describe the support you require from SIV:</pre>`
+      },
+      {
+        title: 'Account Locked Before Launch (FIRE team)',
+        category: 'escalation',
+        tags: ['account locked', 'FIRE', 'blocked', 'BAP'],
+        content: `<p>If seller's account locked before launch and error code shows FIRE team:</p>
+<p><strong>Reference:</strong> Registration ROA WIKI → BAP escalation WIKI</p>`
+      },
+      {
+        title: 'Completed Verification but Cannot Access Seller Central',
+        category: 'tech',
+        tags: ['tech', 'seller central', 'access', 'browser', 'VPN'],
+        content: `<p><strong>Usually a tech issue. Try:</strong></p>
+<ol>
+<li>Change browser (Chrome, Edge, Firefox)</li>
+<li>Turn off VPN/firewall</li>
+<li>Clean cookies</li>
+<li>Re-enter Seller Central</li>
+<li>Check email for further instructions</li>
+</ol>
+<p><strong>If still not working:</strong> Use tech issue SIM or RIVER ticket to escalate. AM send SIV escalation then follow instruction.</p>
+<p><strong>If SIM not fixed:</strong> Fill funnel escalation quip → inform Crystal or Kai → join Friday 11am office hr.</p>`
+      },
+      {
+        title: 'Seller Central Tech Error - Document Upload Issue',
+        category: 'tech',
+        tags: ['tech', 'upload', 'error', 'seller central', 'reactivation'],
+        content: `<p><strong>Case: Technical error preventing document upload during account reactivation</strong></p>
+<ol>
+<li>Change browsers, clean cookies, sign-in again, multiple attempts</li>
+<li>Screen capture error page including URL, open SPS case</li>
+<li>If above doesn't work, reach seller central tech team: <a href="https://tiny.amazon.com/1cm42il7d/tcorpamazcreaopti" target="_blank">Link</a></li>
+</ol>
+<pre>Template:
+• Seller ID: xxxxx
+• Marketplace ID: 1
+• Detailed description of the issue
+• Screenshot of the issue in English
+• URL of the page where issue was observed
+• Timestamp when issue was observed</pre>`
+      },
+      {
+        title: 'Astro - Missing CID (since W46 2025)',
+        category: 'tools',
+        tags: ['Astro', 'CID', 'missing', 'merchant token', 'MCID'],
+        content: `<p><strong>Step 1:</strong> Find CID at <a href="https://sellercentral-internal-na.amazon.com/account-summary" target="_blank">Seller Central Internal</a></p>
+<p><strong>Step 2:</strong> Convert Merchant Token ID to MCID using <a href="https://buyability-analyzer-prod.corp.amazon.com/misc/#encrypt=22365160215" target="_blank">Buyability Analyzer</a></p>
+<ol>
+<li>Put Merchant Token ID in the box, click "Encrypt/Decrypt"</li>
+<li>Put MCID in Vendor Code field</li>
+<li>Change Primary Business Type = "Amazon Seller (Shipper)"</li>
+</ol>`
+      },
+      {
+        title: 'Seller Self-Escalation SOP (Seller Facing)',
+        category: 'escalation',
+        tags: ['seller', 'self-escalation', 'SOP', 'PDF'],
+        content: `<p><strong>Seller facing SIV self-escalation SOP:</strong></p>
+<p><a href="https://m.media-amazon.com/images/G/01/TWSSRguidance/SIV_selfescalation_SOP.pdf" target="_blank">Download PDF</a></p>`
+      },
+      {
+        title: 'OTP (One Time Password Postcard) - Deprecated',
+        category: 'ipv',
+        tags: ['OTP', 'postcard', 'address verification', 'deprecated', 'AV'],
+        content: `<p><strong>Status:</strong> Dialed up 100% for TW SSR on 2022/1/14. Deprecated in 2025 Q4, replaced by AV (Address Verification) in Nov 2025.</p>
+<p><strong>OTP Bypass channel:</strong> Email to TW Funnel POCs:</p>
+<ul>
+<li>DSR: jerrykan@ chiawenk@</li>
+<li>SSR: isanlin@</li>
+</ul>
+<p><strong>Email must include:</strong> Customer ID, DSR/SSR, Marketplace, Company country, Issue description, Why can't pass, How verified address is valid, L7+ approval (if not TW DSR).</p>`
+      },
+      {
+        title: 'RoA Internal Support - MVB FAQ & VOS',
+        category: 'escalation',
+        tags: ['RoA', 'MVB', 'FAQ', 'VOS', 'support'],
+        content: `<p><strong>FAQ & VOS collection:</strong> MVB FAQ&VOS collect (please share any VoS or questions)</p>
+<p><strong>If SIV/BAV escalation failed:</strong> Join SIV escalation office hour to consult investigator.</p>
+<p><strong>Schedule:</strong> Every two weeks on Wed, 3pm TW time on Zoom.</p>
+<p><strong>Requirements:</strong></p>
+<ul>
+<li>Already raised case to siv-internal-escalations-cn@amazon.com</li>
+<li>Have case ID ready</li>
+<li>Log query into quip before joining</li>
+</ul>
+<p><strong>Process owners:</strong> rebebris@ (EU), krismoni@ (IN), keviarce@ (SJO)</p>`
+      },
+      {
+        title: 'Funnel Metrics & Dashboards',
+        category: 'tools',
+        tags: ['funnel', 'metrics', 'dashboard', 'Luigi', 'Mario', 'TTR'],
+        content: `<p><strong>DSR Funnel:</strong> Luigi | <a href="#">Training recording</a> | WIKI</p>
+<p><strong>SSR Funnel:</strong> Mario | <a href="#">Training recording</a></p>
+<p><strong>TTR/Upper funnel/Clean launch and GMS dashboard:</strong> <a href="#">Training recording</a> | WIKI</p>`
+      },
+      {
+        title: 'Registration Guide (Seller Facing)',
+        category: 'documents',
+        tags: ['registration', 'guide', 'guidebook', 'seller facing'],
+        content: `<p><strong>TW2NA Registration Guidebook:</strong> Please read through first for any seller-facing registration questions.</p>
+<p><a href="https://m.media-amazon.com/images/G/28/TWGS/Website/TW_GS_Registration_Guidebook.pdf" target="_blank">Download Guidebook PDF</a></p>`
+      }
+    ];
+
+    // Render
+    function renderCards(items, query = '') {
+      const container = document.getElementById('results');
+      if (items.length === 0) {
+        container.innerHTML = '<div class="no-results">找不到相關結果，請嘗試其他關鍵字。</div>';
+        return;
+      }
+      container.innerHTML = items.map((item, i) => {
+        let content = item.content;
+        let title = item.title;
+        if (query) {
+          const re = new RegExp('(' + query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi');
+          title = title.replace(re, '<span class="highlight">$1</span>');
+          content = content.replace(re, '<span class="highlight">$1</span>');
+        }
+        return `<div class="card" onclick="this.querySelector('.content').classList.toggle('open')">
+          <h3>${title}</h3>
+          <div>${item.tags.map(t => '<span class="tag">' + t + '</span>').join('')}</div>
+          <div class="content">${content}</div>
+        </div>`;
+      }).join('');
+    }
+
+    // Search
+    document.getElementById('search').addEventListener('input', (e) => {
+      const q = e.target.value.toLowerCase().trim();
+      document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+      document.querySelector('[data-cat="all"]').classList.add('active');
+      if (!q) { renderCards(knowledgeBase); return; }
+      const filtered = knowledgeBase.filter(item =>
+        item.title.toLowerCase().includes(q) ||
+        item.tags.some(t => t.toLowerCase().includes(q)) ||
+        item.content.toLowerCase().includes(q)
+      );
+      renderCards(filtered, q);
+    });
+
+    // Category filter
+    document.querySelectorAll('.cat-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const cat = btn.dataset.cat;
+        document.getElementById('search').value = '';
+        if (cat === 'all') { renderCards(knowledgeBase); return; }
+        renderCards(knowledgeBase.filter(item => item.category === cat));
+      });
+    });
+
+    // Initial render
+    renderCards(knowledgeBase);
+  </script>
+</body>
+</html>
