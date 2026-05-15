@@ -20,18 +20,24 @@
     .header { background: linear-gradient(135deg, #232f3e 0%, #37475a 100%); padding: 24px 40px; text-align: center; position: relative; }
     .header h1 { color: #ff9900; font-size: 22px; margin-bottom: 4px; }
     .header p { color: #ccc; font-size: 14px; }
-    .lang-toggle { position: absolute; top: 16px; right: 20px; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); color: #fff; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 700; transition: all 0.2s; }
+    .lang-toggle { position: absolute; top: 16px; right: 20px; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); color: #fff; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 700; transition: all 0.2s; }
     .lang-toggle:hover { background: rgba(255,255,255,0.3); }
+    @media (max-width: 600px) {
+      .lang-toggle { position: static; display: block; margin: 0 auto 12px auto; width: fit-content; }
+      .header { padding: 16px 20px; }
+    }
     .container { max-width: 960px; margin: 24px auto; padding: 0 20px; }
     .card { background: #fff; border-radius: 8px; padding: 24px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
     .card h2 { font-size: 16px; color: #232f3e; margin-bottom: 16px; border-left: 4px solid #ff9900; padding-left: 10px; }
     .category { margin-bottom: 24px; }
     .category-title { font-size: 15px; font-weight: 700; color: #232f3e; margin-bottom: 10px; padding: 8px 12px; background: #f0f4f8; border-radius: 6px; }
     .category-title .num { display: inline-block; width: 24px; height: 24px; background: #ff9900; color: #232f3e; border-radius: 50%; text-align: center; line-height: 24px; font-size: 12px; margin-right: 8px; }
+    .category-title .cat-note { font-size: 12px; font-weight: 400; color: #666; margin-left: 8px; }
     .doc-options { display: flex; gap: 10px; flex-wrap: wrap; margin-left: 36px; }
     .doc-option { padding: 8px 16px; border: 2px solid #e0e0e0; border-radius: 6px; background: #fff; cursor: pointer; font-size: 13px; transition: all 0.2s; }
     .doc-option:hover { border-color: #ff9900; }
     .doc-option.active { border-color: #ff9900; background: #fff8ee; font-weight: 700; }
+    .doc-option.recommended { border-color: #ff9900; background: #fff8ee; }
     .upload-section { display: none; margin-top: 16px; }
     .upload-section.active { display: block; }
     .upload-area { border: 2px dashed #ccc; border-radius: 8px; padding: 30px; text-align: center; cursor: pointer; transition: all 0.2s; }
@@ -99,19 +105,19 @@
       </div>
 
       <div class="category">
-        <div class="category-title"><span class="num">3</span><span class="cat-label">地址驗證文件</span></div>
+        <div class="category-title"><span class="num">3</span><span class="cat-label">地址驗證文件</span><span class="cat-note">（公司賣家直接使用公司文件即可）</span></div>
         <div class="doc-options">
-          <button class="doc-option" data-type="utility_bill">公用事業帳單（水/電/瓦斯/電信）</button>
           <button class="doc-option" data-type="address_bank">銀行對帳單（作為地址證明）</button>
+          <button class="doc-option" data-type="utility_bill">公用事業帳單（水/電/瓦斯/電信）</button>
         </div>
         <div class="req-box category-req" data-for="utility_bill,address_bank" style="display:none;"></div>
       </div>
 
       <div class="category">
-        <div class="category-title"><span class="num">4</span><span class="cat-label">銀行驗證文件</span></div>
+        <div class="category-title"><span class="num">4</span><span class="cat-label">銀行驗證文件</span><span class="cat-note">（銀行驗證用）</span></div>
         <div class="doc-options">
+          <button class="doc-option recommended" data-type="bank_passbook">銀行存摺封面 ⭐ 建議優先使用</button>
           <button class="doc-option" data-type="bank_statement">銀行對帳單</button>
-          <button class="doc-option" data-type="bank_passbook">銀行存摺封面</button>
         </div>
         <div class="req-box category-req" data-for="bank_statement,bank_passbook" style="display:none;"></div>
       </div>
@@ -828,7 +834,9 @@
         cat1: '身分證件',
         cat2: '公司文件',
         cat3: '地址驗證文件',
+        cat3_note: '（公司賣家直接使用公司文件即可）',
         cat4: '銀行驗證文件',
+        cat4_note: '（銀行驗證用）',
         national_id: '國民身分證',
         passport: '護照',
         company_setup: '公司設立登記表',
@@ -837,7 +845,7 @@
         utility_bill: '公用事業帳單（水/電/瓦斯/電信）',
         address_bank: '銀行對帳單（作為地址證明）',
         bank_statement: '銀行對帳單',
-        bank_passbook: '銀行存摺封面',
+        bank_passbook: '銀行存摺封面 ⭐ 建議優先使用',
         upload: '📤 上傳文件',
         uploadHint: '點擊或拖拉文件至此處上傳',
         uploadFormat: '支援 JPG, PNG, PDF（單檔最大 10MB）| 須為彩色掃描',
@@ -860,7 +868,9 @@
         cat1: 'Identity Documents',
         cat2: 'Company Documents',
         cat3: 'Address Verification',
+        cat3_note: '(Business sellers can use company documents directly)',
         cat4: 'Bank Verification',
+        cat4_note: '(For bank verification)',
         national_id: 'National ID Card',
         passport: 'Passport',
         company_setup: 'Company Establishment Registration',
@@ -869,7 +879,7 @@
         utility_bill: 'Utility Bill (Water/Electric/Gas/Telecom)',
         address_bank: 'Bank Statement (as address proof)',
         bank_statement: 'Bank Statement',
-        bank_passbook: 'Bank Passbook Cover',
+        bank_passbook: 'Bank Passbook Cover ⭐ Recommended',
         upload: '📤 Upload Document',
         uploadHint: 'Click or drag files here to upload',
         uploadFormat: 'Supports JPG, PNG, PDF (max 10MB per file) | Must be color scan',
@@ -902,6 +912,11 @@
       document.querySelectorAll('.cat-label').forEach((el, i) => {
         const keys = ['cat1', 'cat2', 'cat3', 'cat4'];
         el.textContent = t[keys[i]];
+      });
+
+      document.querySelectorAll('.cat-note').forEach((el, i) => {
+        const noteKeys = [null, null, 'cat3_note', 'cat4_note'];
+        if (noteKeys[i] && t[noteKeys[i]]) el.textContent = t[noteKeys[i]];
       });
       
       document.querySelectorAll('.doc-option').forEach(btn => {
