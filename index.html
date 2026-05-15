@@ -37,7 +37,6 @@
     .doc-option { padding: 8px 16px; border: 2px solid #e0e0e0; border-radius: 6px; background: #fff; cursor: pointer; font-size: 13px; transition: all 0.2s; }
     .doc-option:hover { border-color: #ff9900; }
     .doc-option.active { border-color: #ff9900; background: #fff8ee; font-weight: 700; }
-    .doc-option.recommended { border-color: #ff9900; background: #fff8ee; }
     .upload-section { display: none; margin-top: 16px; }
     .upload-section.active { display: block; }
     .upload-area { border: 2px dashed #ccc; border-radius: 8px; padding: 30px; text-align: center; cursor: pointer; transition: all 0.2s; }
@@ -116,8 +115,8 @@
       <div class="category">
         <div class="category-title"><span class="num">4</span><span class="cat-label">銀行驗證文件</span><span class="cat-note">（銀行驗證用）</span></div>
         <div class="doc-options">
-          <button class="doc-option recommended" data-type="bank_passbook">銀行存摺封面 ⭐ 建議優先使用</button>
-          <button class="doc-option" data-type="bank_statement">銀行對帳單</button>
+          <button class="doc-option" data-type="bank_passbook">銀行存摺封面</button>
+          <button class="doc-option" data-type="bank_statement">銀行對帳單（銀行驗證用）</button>
         </div>
         <div class="req-box category-req" data-for="bank_statement,bank_passbook" style="display:none;"></div>
       </div>
@@ -844,8 +843,8 @@
         business_reg: '商業登記核准函 + 商業登記抄本',
         utility_bill: '公用事業帳單（水/電/瓦斯/電信）',
         address_bank: '銀行對帳單（作為地址證明）',
-        bank_statement: '銀行對帳單',
-        bank_passbook: '銀行存摺封面 ⭐ 建議優先使用',
+        bank_statement: '銀行對帳單（銀行驗證用）',
+        bank_passbook: '銀行存摺封面',
         upload: '📤 上傳文件',
         uploadHint: '點擊或拖拉文件至此處上傳',
         uploadFormat: '支援 JPG, PNG, PDF（單檔最大 10MB）| 須為彩色掃描',
@@ -878,8 +877,8 @@
         business_reg: 'Business Registration Approval + Transcript',
         utility_bill: 'Utility Bill (Water/Electric/Gas/Telecom)',
         address_bank: 'Bank Statement (as address proof)',
-        bank_statement: 'Bank Statement',
-        bank_passbook: 'Bank Passbook Cover ⭐ Recommended',
+        bank_statement: 'Bank Statement (for bank verification)',
+        bank_passbook: 'Bank Passbook Cover',
         upload: '📤 Upload Document',
         uploadHint: 'Click or drag files here to upload',
         uploadFormat: 'Supports JPG, PNG, PDF (max 10MB per file) | Must be color scan',
