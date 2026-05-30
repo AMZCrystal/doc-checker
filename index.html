@@ -12,7 +12,7 @@
   </script>
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>亞馬遜註冊文件檢查工具 | Amazon Registration Document Checker</title>
+  <title>亞馬遜註冊文件需求指南 | Amazon Registration Document Guide</title>
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -75,14 +75,14 @@
 <body>
   <div class="header">
     <button class="lang-toggle" id="lang-toggle">EN / 中文</button>
-    <h1 id="page-title">📋 亞馬遜註冊文件檢查工具</h1>
-    <p id="page-subtitle">上傳您的註冊文件，系統將自動檢查是否符合亞馬遜要求</p>
+    <h1 id="page-title">📋 亞馬遜註冊文件需求指南</h1>
+    <p id="page-subtitle">查看各類註冊文件的格式要求與注意事項</p>
   </div>
 
   <div class="container">
     <!-- Step 1: Select Document Type -->
     <div class="card">
-      <h2 id="step1-title">選擇您要檢查的文件類型</h2>
+      <h2 id="step1-title">選擇您要查看的文件類型</h2>
 
       <div class="category">
         <div class="category-title"><span class="num">1</span><span class="cat-label">身分證件</span></div>
@@ -144,11 +144,9 @@
     </div>
   </div>
 
-    <div class="card" style="background:#f0fdf0; border:1px solid #86efac;">
-      <p style="font-size:13px; color:#166534; margin:0;" id="privacy-notice">🔒 隱私保護：您上傳的文件僅在您的瀏覽器中進行本地分析，不會上傳至任何伺服器，關閉頁面後所有資料即自動清除。</p>
-    </div>
+    <!-- Privacy notice hidden while upload is disabled -->
   <div class="footer">
-    <p id="footer1">此工具僅供文件格式預檢參考，最終審核結果以亞馬遜官方為準。</p>
+    <p id="footer1">本指南僅供文件準備參考，最終審核結果以亞馬遜官方為準。</p>
     <p id="footer2">© 2026 Amazon Global Selling Taiwan</p>
   </div>
 
@@ -373,31 +371,9 @@
               imgs.map(src => `<img src="${src}" style="max-width:280px; border:1px solid #ddd; border-radius:4px; cursor:pointer;" onclick="window.open('${src}','_blank')" title="點擊放大">`).join('') +
               '</div></div>';
           }
-          reqBox.innerHTML = `<h4>📌 ${currentLang === 'en' && docRequirements_en[selectedType] ? docRequirements_en[selectedType].name + ' — Requirements' : req.name + ' — 文件要求'}</h4><ul>${(currentLang === 'en' && docRequirements_en[selectedType] ? docRequirements_en[selectedType].rules : req.rules).map(r => '<li>' + r + '</li>').join('')}</ul>${imgHtml}
-            <div style="margin-top:16px;">
-              <div style="font-size:14px; font-weight:700; color:#232f3e; margin-bottom:8px;">${currentLang === 'en' ? '📤 Upload Document' : '📤 上傳文件'}</div>
-              <div class="upload-area" id="upload-area">
-                <div class="icon">📄</div>
-                <p>${currentLang === 'en' ? 'Click or drag files here to upload' : '點擊或拖拉文件至此處上傳'}</p>
-                <p style="font-size:11px; color:#999;">${currentLang === 'en' ? 'JPG, PNG, PDF (max 10MB) | Color scan required' : '支援 JPG, PNG, PDF（單檔最大 10MB）| 須為彩色掃描'}</p>
-              </div>
-              <input type="file" class="file-input" id="file-input" accept=".jpg,.jpeg,.png,.pdf" multiple>
-              <div id="file-list"></div>
-            </div>
-            <div style="margin-top:16px;">
-              <button class="check-btn" id="check-btn" disabled>${currentLang === 'en' ? 'Start Document Check' : '開始檢查文件'}</button>
-              <div class="results-container" id="results"></div>
-            </div>`;
+          reqBox.innerHTML = `<h4>📌 ${currentLang === 'en' && docRequirements_en[selectedType] ? docRequirements_en[selectedType].name + ' — Requirements' : req.name + ' — 文件要求'}</h4><ul>${(currentLang === 'en' && docRequirements_en[selectedType] ? docRequirements_en[selectedType].rules : req.rules).map(r => '<li>' + r + '</li>').join('')}</ul>${imgHtml}`;
           
-          // Re-bind upload events
-          const uploadArea = document.getElementById('upload-area');
-          const fileInput = document.getElementById('file-input');
-          uploadArea.addEventListener('click', () => fileInput.click());
-          uploadArea.addEventListener('dragover', (e) => { e.preventDefault(); uploadArea.classList.add('dragover'); });
-          uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
-          uploadArea.addEventListener('drop', (e) => { e.preventDefault(); uploadArea.classList.remove('dragover'); handleFiles(e.dataTransfer.files); });
-          fileInput.addEventListener('change', (e) => handleFiles(e.target.files));
-          document.getElementById('check-btn').addEventListener('click', performCheck);
+          // Upload functionality temporarily disabled for internal review
         }
 
         updateCheckBtn();
@@ -827,9 +803,9 @@
     
     const i18n = {
       zh: {
-        title: '📋 亞馬遜註冊文件檢查工具',
-        subtitle: '上傳您的註冊文件，系統將自動檢查是否符合亞馬遜要求',
-        step1: '選擇您要檢查的文件類型',
+        title: '📋 亞馬遜註冊文件需求指南',
+        subtitle: '查看各類註冊文件的格式要求與注意事項',
+        step1: '選擇您要查看的文件類型',
         cat1: '身分證件',
         cat2: '公司文件',
         cat3: '地址驗證文件',
@@ -854,16 +830,16 @@
         nameTranslate: '身分證姓名英譯：請至外交部查詢',
         companyName: '公司英文名：請將您的公司名稱翻譯成英文羅馬拼音後填寫，事後再以此英文公司名稱到國貿局登記申請。查詢請至經濟部登記系統',
         address: '公司與信用卡英文地址：請至郵局系統翻譯',
-        footer1: '此工具僅供文件格式預檢參考，最終審核結果以亞馬遜官方為準。',
+        footer1: '本指南僅供文件準備參考，最終審核結果以亞馬遜官方為準。',
         footer2: '© 2026 Amazon Global Selling Taiwan',
         imgDisclaimer: '⚠️ 以下截圖僅供參考需求資訊，上傳資料請使用掃描完整文檔，勿用照片截圖。',
         imgTitle: '📷 文件圖例：',
         toggleBtn: 'EN / 中文'
       },
       en: {
-        title: '📋 Amazon Registration Document Checker',
-        subtitle: 'Upload your registration documents to check if they meet Amazon requirements',
-        step1: 'Select the document type to check',
+        title: '📋 Amazon Registration Document Guide',
+        subtitle: 'View format requirements and guidelines for each registration document',
+        step1: 'Select the document type to view',
         cat1: 'Identity Documents',
         cat2: 'Company Documents',
         cat3: 'Address Verification',
@@ -888,7 +864,7 @@
         nameTranslate: 'English name translation: Check at Ministry of Foreign Affairs',
         companyName: 'Company English name: Translate your company name to English romanization, then register this English name with Bureau of Foreign Trade. Check at MOEA',
         address: 'Company & credit card English address: Translate at Chunghwa Post',
-        footer1: 'This tool is for preliminary format checking only. Final review results are subject to Amazon official verification.',
+        footer1: 'This guide is for document preparation reference only. Final review results are subject to Amazon official verification.',
         footer2: '© 2026 Amazon Global Selling Taiwan',
         imgDisclaimer: '⚠️ Images below are for reference only. Please upload color-scanned complete documents, not photo screenshots.',
         imgTitle: '📷 Document Examples:',
