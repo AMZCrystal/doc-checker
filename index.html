@@ -112,14 +112,7 @@
         <div class="req-box category-req" data-for="utility_bill,address_bank" style="display:none;"></div>
       </div>
 
-      <div class="category">
-        <div class="category-title"><span class="num">4</span><span class="cat-label">銀行驗證文件</span><span class="cat-note">（銀行驗證用）</span></div>
-        <div class="doc-options">
-          <button class="doc-option" data-type="bank_passbook">銀行存摺封面</button>
-          <button class="doc-option" data-type="bank_statement">銀行對帳單（銀行驗證用）</button>
-        </div>
-        <div class="req-box category-req" data-for="bank_statement,bank_passbook" style="display:none;"></div>
-      </div>
+
 
       <!-- Remove old req-display -->
     </div>
@@ -297,38 +290,7 @@
           '單檔不超過 10MB'
         ]
       },
-      bank_statement: {
-        name: '銀行對帳單',
-        category: '銀行驗證文件',
-        rules: [
-          '必須為 180 天內的銀行對帳單',
-          '不接受信用卡對帳單',
-          '須顯示帳戶持有人姓名或公司名稱',
-          '須顯示銀行名稱和 LOGO',
-          '須顯示帳號後三碼（帳號末三碼須清晰可見）',
-          '須顯示對帳單日期（民國年 + 1911 = 西元年）',
-          '不接受線上數位銀行（如 N26、Revolut）提供的文件',
-          '必須為正式 PDF 或彩色掃描，不接受螢幕截圖',
-          '不接受手機 APP 截圖',
-          '檔案格式：JPG、PNG 或 PDF',
-          '單檔不超過 10MB'
-        ]
-      },
-      bank_passbook: {
-        name: '銀行存摺封面',
-        category: '銀行驗證文件',
-        rules: [
-          '必須為銀行存摺封面（含帳戶資訊頁）',
-          '必須為彩色掃描，不接受黑白影印',
-          '須顯示帳戶持有人姓名或公司名稱',
-          '須顯示銀行名稱',
-          '須顯示完整帳號',
-          '姓名須與註冊帳戶一致',
-          '不接受螢幕截圖',
-          '檔案格式：JPG、PNG 或 PDF',
-          '單檔不超過 10MB'
-        ]
-      }
+
     };
 
     let selectedType = null;
@@ -341,9 +303,7 @@
       company_change: ['images/slide8_img5.png'],
       business_reg: ['images/slide8_img3.png', 'images/slide8_img4.png'],
       utility_bill: [],
-      address_bank: ['images/slide31_img23.png'],
-      bank_statement: ['images/bank_statement_sample.png'],
-      bank_passbook: ['images/bank_passbook_sample.png']
+      address_bank: ['images/slide31_img23.png']
     };
 
     // Document type selection
@@ -640,8 +600,8 @@
             fileChecks.push({ s: 'pass', t: '✅ 文字辨識成功', d: `成功辨識 ${ocrResult.text.length} 個字元。` });
             
             // Date check for documents that require date validation
-            if (['utility_bill', 'address_bank', 'bank_statement'].includes(selectedType)) {
-              const requiredDays = ['utility_bill', 'address_bank'].includes(selectedType) ? 90 : 180;
+            if (['utility_bill', 'address_bank'].includes(selectedType)) {
+              const requiredDays = 90;
               if (ocrResult.dates.length > 0) {
                 const latestDate = ocrResult.dates.sort((a, b) => new Date(b.year, b.month-1, b.day) - new Date(a.year, a.month-1, a.day))[0];
                 const dateStr = `${latestDate.year}/${latestDate.month}/${latestDate.day}`;
@@ -701,12 +661,6 @@
           const rocYear = new Date().getFullYear() - 1911;
           const rocCutoff = `民國 ${rocYear} 年 ${String(new Date(cutoff90).getMonth()+1).padStart(2,'0')} 月 ${String(new Date(cutoff90).getDate()).padStart(2,'0')} 日`;
           docChecks.push({ s: 'warn', t: '⚠️ 請確認文件日期在 90 天內', d: `文件上的發單日期必須在 ${cutoff90}（${rocCutoff}）之後。如文件日期早於此日期，將不被接受。台灣文件常使用民國年，請換算確認：民國年 + 1911 = 西元年。` });
-        }
-        if (selectedType === 'bank_statement') {
-          const cutoff180 = getDateBefore(180);
-          const rocYear180 = new Date(cutoff180).getFullYear() - 1911;
-          const rocCutoff180 = `民國 ${rocYear180} 年 ${String(new Date(cutoff180).getMonth()+1).padStart(2,'0')} 月 ${String(new Date(cutoff180).getDate()).padStart(2,'0')} 日`;
-          docChecks.push({ s: 'warn', t: '⚠️ 請確認文件日期在 180 天內', d: `文件上的發單日期必須在 ${cutoff180}（${rocCutoff180}）之後。台灣文件常使用民國年，請換算確認：民國年 + 1911 = 西元年。` });
         }
         if (selectedType === 'passport') {
           docChecks.push({ s: 'warn', t: '⚠️ 請確認護照未過期', d: '護照到期日必須晚於今天。過期護照將不被接受。' });
@@ -793,9 +747,7 @@
       company_change: { name: 'Company Change Registration', rules: ['Must be latest version','Must be a color scan, B&W not accepted','Company name must match registered account','UBN (8 digits) clearly visible','Must have MOEA/local govt approval stamp','Must be most recent change','Screenshots not accepted','Format: JPG, PNG or PDF','Max size: 10MB'] },
       business_reg: { name: 'Business Reg. Approval + Transcript', rules: ['Must upload BOTH approval letter AND transcript','Must be a color scan, B&W not accepted','Business name must match registered account','UBN (8 digits) clearly visible','Must have local govt approval stamp','Status must be Active','Screenshots not accepted','Format: JPG, PNG or PDF','Max size: 10MB'] },
       utility_bill: { name: 'Utility Bill', rules: ['Must be issued within last 90 days','Accepted: water, electricity, gas, landline telecom','Must show account holder/company name','Must show complete billing address','Must show issue date (ROC year + 1911 = Western year)','Must be color scan or official PDF, no screenshots','Mobile app screenshots not accepted','Format: JPG, PNG or PDF','Max size: 10MB'] },
-      address_bank: { name: 'Bank Statement (address proof)', rules: ['Must be issued within last 90 days','Must show account holder/company name','Must show bank name and logo','Must show complete billing address','Must show statement date','Online digital banks (N26, Revolut) not accepted','Must be official PDF or color scan, no screenshots','Format: JPG, PNG or PDF','Max size: 10MB'] },
-      bank_statement: { name: 'Bank Statement', rules: ['Must be issued within last 180 days','Credit card statements NOT accepted','Must show account holder/company name','Must show bank name and logo','Must show last 3 digits of account number','Must show statement date','Online digital banks (N26, Revolut) not accepted','Must be official PDF or color scan, no screenshots','Mobile app screenshots not accepted','Format: JPG, PNG or PDF','Max size: 10MB'] },
-      bank_passbook: { name: 'Bank Passbook Cover', rules: ['Must be passbook cover page (with account info)','Must be a color scan, B&W not accepted','Must show account holder/company name','Must show bank name','Must show complete account number','Name must match registered account','Screenshots not accepted','Format: JPG, PNG or PDF','Max size: 10MB'] }
+      address_bank: { name: 'Bank Statement (address proof)', rules: ['Must be issued within last 90 days','Must show account holder/company name','Must show bank name and logo','Must show complete billing address','Must show statement date','Online digital banks (N26, Revolut) not accepted','Must be official PDF or color scan, no screenshots','Format: JPG, PNG or PDF','Max size: 10MB'] }
     };
 
     // === i18n Language Toggle ===
@@ -819,8 +771,6 @@
         business_reg: '商業登記核准函 + 商業登記抄本',
         utility_bill: '公用事業帳單（水/電/瓦斯/電信）',
         address_bank: '銀行對帳單（作為地址證明）',
-        bank_statement: '銀行對帳單（銀行驗證用）',
-        bank_passbook: '銀行存摺封面',
         upload: '📤 上傳文件',
         uploadHint: '點擊或拖拉文件至此處上傳',
         uploadFormat: '支援 JPG, PNG, PDF（單檔最大 10MB）| 須為彩色掃描',
@@ -853,8 +803,6 @@
         business_reg: 'Business Registration Approval + Transcript',
         utility_bill: 'Utility Bill (Water/Electric/Gas/Telecom)',
         address_bank: 'Bank Statement (as address proof)',
-        bank_statement: 'Bank Statement (for bank verification)',
-        bank_passbook: 'Bank Passbook Cover',
         upload: '📤 Upload Document',
         uploadHint: 'Click or drag files here to upload',
         uploadFormat: 'Supports JPG, PNG, PDF (max 10MB per file) | Must be color scan',
