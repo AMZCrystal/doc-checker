@@ -104,7 +104,16 @@
       </div>
 
       <div class="category">
-        <div class="category-title"><span class="num">3</span><span class="cat-label">地址驗證文件</span><span class="cat-note">（公司賣家直接使用公司文件即可）</span></div>
+        <div class="category-title"><span class="num">3</span><span class="cat-label">個人身份驗證第二文件</span><span class="cat-note">（個人賣家適用）</span><span style="color:#d13212; font-size:12px; font-weight:700; margin-left:8px;">❌ 不接受電話費帳單（手機或市話）</span></div>
+        <div class="doc-options">
+          <button class="doc-option" data-type="personal_bank">銀行或信用卡對帳單</button>
+          <button class="doc-option" data-type="personal_utility">公用事業帳單（水/電/瓦斯）</button>
+        </div>
+        <div class="req-box category-req" data-for="personal_bank,personal_utility" style="display:none;"></div>
+      </div>
+
+      <div class="category">
+        <div class="category-title"><span class="num">4</span><span class="cat-label">地址驗證文件</span><span class="cat-note">（公司賣家直接使用公司文件即可）</span></div>
         <div class="doc-options">
           <button class="doc-option" data-type="address_bank">銀行對帳單（作為地址證明）</button>
           <button class="doc-option" data-type="utility_bill">公用事業帳單（水/電/瓦斯/電信）</button>
@@ -275,6 +284,38 @@
           '單檔不超過 10MB'
         ]
       },
+      personal_bank: {
+        name: '銀行或信用卡對帳單（個人身份驗證）',
+        category: '個人身份驗證第二文件',
+        rules: [
+          '必須為 6 個月內開立的對帳單',
+          '接受：銀行存摺對帳單或信用卡月結帳單',
+          '須顯示帳戶持有人姓名（須與註冊帳戶一致）',
+          '須顯示銀行名稱和 LOGO',
+          '須顯示完整帳單地址',
+          '須顯示對帳單日期',
+          '必須為彩色掃描或正式 PDF，不接受螢幕截圖',
+          '不接受線上數位銀行（如 N26、Revolut）提供的文件',
+          '檔案格式：JPG、PNG 或 PDF',
+          '單檔不超過 10MB'
+        ]
+      },
+      personal_utility: {
+        name: '公用事業帳單（個人身份驗證）',
+        category: '個人身份驗證第二文件',
+        rules: [
+          '必須為 3 個月內（90天）開立的帳單',
+          '接受：水費、電費、瓦斯費帳單',
+          '❌ 不接受電話費帳單（手機或市話）',
+          '須顯示帳戶持有人姓名（須與註冊帳戶一致）',
+          '須顯示完整帳單地址',
+          '須顯示發單日期（民國年 + 1911 = 西元年）',
+          '必須為彩色掃描或正式 PDF，不接受螢幕截圖',
+          '不接受手機帳單 APP 截圖',
+          '檔案格式：JPG、PNG 或 PDF',
+          '單檔不超過 10MB'
+        ]
+      },
       address_bank: {
         name: '銀行對帳單（地址證明用）',
         category: '地址驗證文件',
@@ -302,6 +343,8 @@
       company_setup: ['images/slide8_img5.png'],
       company_change: ['images/slide8_img5.png'],
       business_reg: ['images/slide8_img3.png', 'images/slide8_img4.png'],
+      personal_bank: ['images/slide31_img23.png'],
+      personal_utility: [],
       utility_bill: [],
       address_bank: ['images/slide31_img23.png']
     };
@@ -747,6 +790,8 @@
       company_change: { name: 'Company Change Registration', rules: ['Must be latest version','Must be a color scan, B&W not accepted','Company name must match registered account','UBN (8 digits) clearly visible','Must have MOEA/local govt approval stamp','Must be most recent change','Screenshots not accepted','Format: JPG, PNG or PDF','Max size: 10MB'] },
       business_reg: { name: 'Business Reg. Approval + Transcript', rules: ['Must upload BOTH approval letter AND transcript','Must be a color scan, B&W not accepted','Business name must match registered account','UBN (8 digits) clearly visible','Must have local govt approval stamp','Status must be Active','Screenshots not accepted','Format: JPG, PNG or PDF','Max size: 10MB'] },
       utility_bill: { name: 'Utility Bill', rules: ['Must be issued within last 90 days','Accepted: water, electricity, gas, landline telecom','Must show account holder/company name','Must show complete billing address','Must show issue date (ROC year + 1911 = Western year)','Must be color scan or official PDF, no screenshots','Mobile app screenshots not accepted','Format: JPG, PNG or PDF','Max size: 10MB'] },
+      personal_bank: { name: 'Bank/Credit Card Statement (Personal Identity Verification)', rules: ['Must be dated within the last 6 months','Accepted: bank statement or credit card statement','Must show account holder name (must match registered account)','Must show bank name and logo','Must show complete billing address','Must show statement date','Online digital banks (N26, Revolut) not accepted','Must be official PDF or color scan, no screenshots','Format: JPG, PNG or PDF','Max size: 10MB'] },
+      personal_utility: { name: 'Utility Bill (Personal Identity Verification)', rules: ['Recent utility bill dated within the last 3 months','Accepted: electricity, gas, or water bill','❌ Phone/telecom bills are NOT accepted','Must show account holder name (must match registered account)','Must show complete billing address','Must show issue date','Must be color scan or official PDF, no screenshots','Mobile app screenshots not accepted','Format: JPG, PNG or PDF','Max size: 10MB'] },
       address_bank: { name: 'Bank Statement (address proof)', rules: ['Must be issued within last 90 days','Must show account holder/company name','Must show bank name and logo','Must show complete billing address','Must show statement date','Online digital banks (N26, Revolut) not accepted','Must be official PDF or color scan, no screenshots','Format: JPG, PNG or PDF','Max size: 10MB'] }
     };
 
@@ -760,15 +805,18 @@
         step1: '選擇您要查看的文件類型',
         cat1: '身分證件',
         cat2: '公司文件',
-        cat3: '地址驗證文件',
-        cat3_note: '（公司賣家直接使用公司文件即可）',
-        cat4: '銀行驗證文件',
+        cat3: '個人身份驗證第二文件',
+        cat3_note: '（個人賣家適用）',
+        cat4: '地址驗證文件',
+        cat4_note: '（公司賣家直接使用公司文件即可）',
         cat4_note: '（銀行驗證用）',
         national_id: '國民身分證',
         passport: '護照',
         company_setup: '公司設立登記表',
         company_change: '公司變更登記表',
         business_reg: '商業登記核准函 + 商業登記抄本',
+        personal_bank: '銀行或信用卡對帳單',
+        personal_utility: '公用事業帳單（水/電/瓦斯）',
         utility_bill: '公用事業帳單（水/電/瓦斯/電信）',
         address_bank: '銀行對帳單（作為地址證明）',
         upload: '📤 上傳文件',
@@ -792,15 +840,18 @@
         step1: 'Select the document type to view',
         cat1: 'Identity Documents',
         cat2: 'Company Documents',
-        cat3: 'Address Verification',
-        cat3_note: '(Business sellers can use company documents directly)',
-        cat4: 'Bank Verification',
+        cat3: 'Personal Identity Secondary Document',
+        cat3_note: '(For individual sellers)',
+        cat4: 'Address Verification',
+        cat4_note: '(Business sellers can use company documents directly)',
         cat4_note: '(For bank verification)',
         national_id: 'National ID Card',
         passport: 'Passport',
         company_setup: 'Company Establishment Registration',
         company_change: 'Company Change Registration',
         business_reg: 'Business Registration Approval + Transcript',
+        personal_bank: 'Bank or Credit Card Statement',
+        personal_utility: 'Utility Bill (Electricity/Gas/Water)',
         utility_bill: 'Utility Bill (Water/Electric/Gas/Telecom)',
         address_bank: 'Bank Statement (as address proof)',
         upload: '📤 Upload Document',
