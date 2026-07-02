@@ -124,9 +124,10 @@
       <div class="category">
         <div class="category-title"><span class="num">5</span><span class="cat-label">銀行驗證文件</span><span class="cat-note">（銀行驗證用）</span></div>
         <div class="doc-options">
+          <button class="doc-option" data-type="bank_passbook">銀行存摺封面</button>
           <button class="doc-option" data-type="bank_statement">銀行對帳單（銀行驗證）</button>
         </div>
-        <div class="req-box category-req" data-for="bank_statement" style="display:none;"></div>
+        <div class="req-box category-req" data-for="bank_passbook,bank_statement" style="display:none;"></div>
       </div>
 
 
@@ -339,6 +340,21 @@
           '單檔不超過 10MB'
         ]
       },
+      bank_passbook: {
+        name: '銀行存摺封面',
+        category: '銀行驗證文件',
+        rules: [
+          '必須為彩色掃描或拍照，不接受黑白影印',
+          '須顯示帳戶持有人姓名（須與註冊帳戶一致）',
+          '須顯示銀行名稱',
+          '須顯示完整帳戶號碼',
+          '須顯示分行名稱',
+          '封面四角完整可見，不可被遮擋或裁切',
+          '不接受螢幕截圖',
+          '檔案格式：JPG、PNG 或 PDF',
+          '單檔不超過 10MB'
+        ]
+      },
       bank_statement: {
         name: '銀行對帳單（銀行驗證）',
         category: '銀行驗證文件',
@@ -370,6 +386,7 @@
       personal_utility: [],
       utility_bill: [],
       address_bank: ['images/slide31_img23.png'],
+      bank_passbook: ['images/slide31_img23.png'],
       bank_statement: ['images/slide31_img23.png']
     };
 
@@ -817,7 +834,8 @@
       personal_bank: { name: 'Bank/Credit Card Statement (Personal Identity Verification)', rules: ['Must be dated within the last 6 months','Accepted: bank statement or credit card statement','Must show account holder name (must match registered account)','Must show bank name and logo','Must show complete billing address','Must show statement date','Online digital banks (N26, Revolut) not accepted','Must be official PDF or color scan, no screenshots','Format: JPG, PNG or PDF','Max size: 10MB'] },
       personal_utility: { name: 'Utility Bill (Personal Identity Verification)', rules: ['Recent utility bill dated within the last 3 months','Accepted: electricity, gas, or water bill','❌ Phone/telecom bills are NOT accepted','Must show account holder name (must match registered account)','Must show complete billing address','Must show issue date','Must be color scan or official PDF, no screenshots','Mobile app screenshots not accepted','Format: JPG, PNG or PDF','Max size: 10MB'] },
       address_bank: { name: 'Bank Statement (address proof)', rules: ['Must be issued within last 90 days','Must show account holder/company name','Must show bank name and logo','Must show complete billing address','Must show statement date','Online digital banks (N26, Revolut) not accepted','Must be official PDF or color scan, no screenshots','Format: JPG, PNG or PDF','Max size: 10MB'] },
-      bank_statement: { name: 'Bank Statement (Bank Verification)', rules: ['Must be issued within last 90 days','Must show account holder name (must match registered account)','Must show bank name and logo','Must show account number (at least last 4 digits visible)','Must show statement date','Online digital banks (N26, Revolut) not accepted','Must be official PDF or color scan, no screenshots','Format: JPG, PNG or PDF','Max size: 10MB'] }
+      bank_statement: { name: 'Bank Statement (Bank Verification)', rules: ['Must be issued within last 90 days','Must show account holder name (must match registered account)','Must show bank name and logo','Must show account number (at least last 4 digits visible)','Must show statement date','Online digital banks (N26, Revolut) not accepted','Must be official PDF or color scan, no screenshots','Format: JPG, PNG or PDF','Max size: 10MB'] },
+      bank_passbook: { name: 'Bank Passbook Cover', rules: ['Must be color scan or photo, B&W not accepted','Must show account holder name (must match registered account)','Must show bank name','Must show full account number','Must show branch name','All four corners fully visible, no obstruction or cropping','Screenshots not accepted','Format: JPG, PNG or PDF','Max size: 10MB'] }
     };
 
     // === i18n Language Toggle ===
@@ -847,6 +865,7 @@
         utility_bill: '公用事業帳單（水/電/瓦斯/電信）',
         address_bank: '銀行對帳單（作為地址證明）',
         bank_statement: '銀行對帳單（銀行驗證）',
+        bank_passbook: '銀行存摺封面',
         upload: '📤 上傳文件',
         uploadHint: '點擊或拖拉文件至此處上傳',
         uploadFormat: '支援 JPG, PNG, PDF（單檔最大 10MB）| 須為彩色掃描',
@@ -885,6 +904,7 @@
         utility_bill: 'Utility Bill (Water/Electric/Gas/Telecom)',
         address_bank: 'Bank Statement (as address proof)',
         bank_statement: 'Bank Statement (Bank Verification)',
+        bank_passbook: 'Bank Passbook Cover',
         upload: '📤 Upload Document',
         uploadHint: 'Click or drag files here to upload',
         uploadFormat: 'Supports JPG, PNG, PDF (max 10MB per file) | Must be color scan',
